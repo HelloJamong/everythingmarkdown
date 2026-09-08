@@ -106,6 +106,8 @@ DESIGN.md               # 향후 GUI 구현 시 이 문서의 UI 계약을 구�
 
 ## 5. CLI 계약
 
+P2 구현과 현재 실행 근거는 [CLI 검증 기록](p2-validation.md)을 따른다. 첫 배포 전 `--version`은 숫자 대신 개발 상태를 표시한다. 아래 `everythingmarkdown-gui`는 P3 예정 진입점이며 아직 제공하지 않는다.
+
 ```text
 everythingmarkdown ./report.docx
 everythingmarkdown "./회의 자료.pdf"
@@ -160,6 +162,9 @@ everythingmarkdown-gui             # GUI 별도 진입점
 
 ## 8. 배포와 호환성
 
+최종 배포 파일과 버전·태그·노트 규칙은 후속 사용자 요구를 반영한 [릴리즈 정책](releasing.md)을 따른다.
+아래 onedir/분리 실행물은 P0 검증 형태이며 최종 사용자 배포 패키지와 구분한다.
+
 - 개발 기준 Python 3.12, OS 지원 목표 Windows 11 x64 / macOS 14+ Apple Silicon. Windows ARM64·macOS Intel·이전 OS는 사용자 확정 요구가 아니며 필요 시 별도 빌드/검증을 추가한다.
 - 릴리스 지원표는 실제 CI/실기기 패키징 결과를 근거로 확정한다. Linux 개발 머신의 테스트만으로 Windows/macOS 지원 완료를 선언하지 않는다.
 - 초기 패키징은 PyInstaller one-directory 형태를 우선 검증한다. GUI와 console CLI는 같은 제품 배포물의 별도 실행 파일로 제공해 Windows의 stdout/stdin과 창 숨김 충돌을 피한다.
@@ -170,6 +175,8 @@ everythingmarkdown-gui             # GUI 별도 진입점
 - 서드파티 라이선스/고지와 포맷 extras별 의존성을 릴리스 전에 확인한다. GUI 프레임워크 변경은 기본 스택 패키징 실패 또는 제품 범위 확대 시에만 재검토한다.
 
 ## 9. 구현 단계와 완료 조건
+
+**후속 범위 변경 (2026-09-08):** 사용자 요청으로 아래 표의 목표 OS 실환경 테스트는 배포 후 별도 단계로 이관한다. P0 로컬 검증으로 P1을 시작하며, 로컬 자동 테스트·정적 검사·목표 OS별 파일 빌드는 유지한다. 아래 표는 원래 설계 기준선이고 현재 착수/완료 조건은 [TODO](../TODO.md)와 [릴리즈 정책](releasing.md)을 따른다. 미검증 항목은 통과로 처리하지 않는다.
 
 | 단계 | 작업/예정 파일 | 검증 및 다음 단계 조건 |
 |---|---|---|

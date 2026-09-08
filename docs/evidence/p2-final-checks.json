@@ -1,0 +1,30 @@
+{
+  "recorded_at": "2026-09-08T06:17:08.536309+00:00",
+  "phase": "P2 CLI implemented and locally verified",
+  "python": "3.12.13",
+  "markitdown": "0.1.7",
+  "tests": {
+    "count": 103,
+    "exit_code": 0,
+    "p2_unit": 21,
+    "p2_integration": 8,
+    "previous_p0_p1": 74
+  },
+  "network_isolated_tests": {
+    "count": 103,
+    "exit_code": 0
+  },
+  "compileall_exit_code": 0,
+  "tabnanny_exit_code": 0,
+  "dependency_check_exit_code": 0,
+  "locked_sync_exit_code": 0,
+  "ast_duplicate_definitions": "none",
+  "release_version_entries": "none; first release pending user distribution request",
+  "package_placeholder_version": "0.0.0 unchanged",
+  "dependency_lock_changed": false,
+  "cli_version_output": "EverythingMarkdown (개발 중; 정식 릴리즈 없음)",
+  "runtime_smoke": "module and installed console entry point; seven formats and Linux PTY",
+  "target_platform_tests": "deferred until after distribution per user request",
+  "lint_typecheck": "not run; tools/configuration not selected; syntax/indentation/AST checks only",
+  "local_markdown_links": "all targets exist"
+}

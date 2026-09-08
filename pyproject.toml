@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "everythingmarkdown"
 version = "0.0.0"
-description = "Local Markdown conversion for Windows and macOS (P0 feasibility probe)"
+description = "Local Markdown conversion core and CLI for Windows and macOS"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 license = "MIT"
@@ -13,6 +13,7 @@ license-files = ["LICENSE"]
 dependencies = ["markitdown[pdf,docx,pptx,xlsx]==0.1.7"]
 
 [project.scripts]
+everythingmarkdown = "everythingmarkdown.cli:main"
 everythingmarkdown-p0 = "everythingmarkdown.p0:main"
 
 [project.gui-scripts]

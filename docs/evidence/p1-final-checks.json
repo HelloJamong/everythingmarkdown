@@ -1,0 +1,43 @@
+{
+  "recorded_at": "2026-09-08T06:08:22.334291+00:00",
+  "phase": "P1 complete locally; platform runtime testing deferred by user",
+  "python": "3.12.13",
+  "markitdown": "0.1.7",
+  "tests": {
+    "command": ".venv/bin/python -m unittest discover -s tests -v",
+    "count": 74,
+    "exit_code": 0
+  },
+  "network_isolated_tests": {
+    "command": "unshare --user --map-root-user --net .venv/bin/python -m unittest discover -s tests -v",
+    "count": 74,
+    "exit_code": 0
+  },
+  "compileall": {
+    "exit_code": 0,
+    "scope": "src tests scripts packaging"
+  },
+  "tabnanny": {
+    "exit_code": 0,
+    "scope": "src tests scripts packaging"
+  },
+  "dependency_check": {
+    "command": "uv pip check",
+    "exit_code": 0
+  },
+  "locked_sync": {
+    "command": "uv sync --locked --group build",
+    "exit_code": 0
+  },
+  "dependency_or_version_changes": false,
+  "new_release_version_entries": false,
+  "static_checks": [
+    "AST parse",
+    "no duplicate definitions",
+    "git diff --check",
+    "local Markdown links"
+  ],
+  "lint_typecheck": "not run; no selected tools/config; syntax and indentation checks are not full lint/typecheck",
+  "platform_builds_and_runtime": "not run in P1; runtime tests deferred until after distribution",
+  "commits_tags_pushes_releases": "not performed in this task"
+}
