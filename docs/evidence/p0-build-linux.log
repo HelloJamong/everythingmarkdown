@@ -1,0 +1,256 @@
+27 INFO: PyInstaller: 6.22.2, contrib hooks: 2026.7
+28 INFO: Python: 3.12.13
+29 INFO: Platform: Linux-5.14.0-687.17.1.el9_8.x86_64-x86_64-with-glibc2.34
+29 INFO: Python environment: /home/dev/project/everythingmarkdown/.venv
+29 INFO: wrote /home/dev/project/everythingmarkdown/build/everythingmarkdown-p0.spec
+30 INFO: Removing temporary files and cleaning cache in /home/dev/.cache/pyinstaller
+38 INFO: Module search paths (PYTHONPATH):
+['/home/dev/project/everythingmarkdown',
+ '/home/dev/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python312.zip',
+ '/home/dev/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12',
+ '/home/dev/.local/share/uv/python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/lib-dynload',
+ '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages',
+ '/home/dev/project/everythingmarkdown/src',
+ '/home/dev/project/everythingmarkdown/packaging',
+ '/home/dev/project/everythingmarkdown/src']
+165 INFO: Appending 'datas' from .spec
+166 INFO: checking Analysis
+166 INFO: Building Analysis because Analysis-00.toc is non existent
+166 INFO: Looking for Python shared library...
+171 INFO: Using Python shared library: /home/dev/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/libpython3.12.so.1.0
+171 INFO: Running Analysis Analysis-00.toc
+171 INFO: Target bytecode optimization level: 0
+171 INFO: Initializing module dependency graph...
+171 INFO: Initializing module graph hook caches...
+175 INFO: Analyzing modules for base_library.zip ...
+499 INFO: Processing standard module hook 'hook-heapq.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+550 INFO: Processing standard module hook 'hook-encodings.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+1328 INFO: Processing standard module hook 'hook-math.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+1608 INFO: Processing standard module hook 'hook-pickle.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+2548 INFO: Caching module dependency graph...
+2567 INFO: Analyzing /home/dev/project/everythingmarkdown/packaging/p0_cli.py
+2595 INFO: Processing standard module hook 'hook-platform.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+2616 INFO: Processing standard module hook 'hook-urllib3.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+2845 INFO: Processing pre-safe-import-module hook 'hook-backports.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+2845 INFO: SetuptoolsInfo: initializing cached setuptools info...
+2990 INFO: Setuptools: 'backports' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.backports'!
+2994 INFO: Processing standard module hook 'hook-setuptools.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+2999 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+3026 INFO: Processing standard module hook 'hook-sysconfig.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3028 INFO: Processing pre-safe-import-module hook 'hook-jaraco.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+3028 INFO: Setuptools: 'jaraco' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco'!
+3033 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+3033 INFO: Setuptools: 'more_itertools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.more_itertools'!
+3103 INFO: Processing standard module hook 'hook-_osx_support.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3104 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+3254 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3296 INFO: Processing standard module hook 'hook-xml.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3409 INFO: Processing standard module hook 'hook-_ctypes.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3579 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+3743 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3744 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+4101 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+4101 INFO: Setuptools: 'tomli' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.tomli'!
+4402 INFO: Processing pre-safe-import-module hook 'hook-wheel.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+4402 INFO: Setuptools: 'wheel' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.wheel'!
+4681 INFO: Processing standard module hook 'hook-certifi.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+4705 INFO: Processing standard module hook 'hook-charset_normalizer.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+4779 INFO: Processing standard module hook 'hook-cryptography.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+5029 INFO: hook-cryptography: cryptography does not seem to be using dynamically linked OpenSSL.
+5217 INFO: Processing standard module hook 'hook-numpy.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+5677 INFO: Processing standard module hook 'hook-webbrowser.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+6443 INFO: Processing standard module hook 'hook-difflib.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+6844 INFO: Processing standard module hook 'hook-onnxruntime.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+7055 INFO: Processing standard module hook 'hook-xml.dom.domreg.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+7424 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+7649 INFO: Processing standard module hook 'hook-lxml.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+7747 INFO: Processing standard module hook 'hook-lxml.etree.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+7932 INFO: Processing standard module hook 'hook-pdfminer.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+8235 INFO: Processing standard module hook 'hook-PIL.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+8290 INFO: Processing standard module hook 'hook-PIL.Image.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+8485 INFO: Processing standard module hook 'hook-PIL.ImageFilter.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+8598 INFO: Processing standard module hook 'hook-pandas.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+9169 INFO: Processing standard module hook 'hook-zoneinfo.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+9924 INFO: Processing standard module hook 'hook-pandas.io.formats.style.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+11025 INFO: Processing standard module hook 'hook-pandas.plotting.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+11308 INFO: Processing standard module hook 'hook-dateutil.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+11495 INFO: Processing pre-safe-import-module hook 'hook-six.moves.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+11874 INFO: Processing standard module hook 'hook-openpyxl.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+13071 INFO: Processing standard module hook 'hook-sqlite3.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+13216 INFO: Processing standard module hook 'hook-pandas.io.clipboard.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+13631 INFO: Processing standard module hook 'hook-pypdfium2.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+13634 INFO: Processing standard module hook 'hook-pypdfium2_raw.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+13812 INFO: Processing standard module hook 'hook-pptx.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+14442 INFO: Processing pre-find-module-path hook 'hook-tkinter.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_find_module_path'
+14442 INFO: TclTkInfo: initializing cached Tcl/Tk info...
+14539 INFO: Processing standard module hook 'hook-_tkinter.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+14560 INFO: Processing module hooks (post-graph stage)...
+14664 INFO: Processing standard module hook 'hook-lxml.isoschematron.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+14804 INFO: Processing standard module hook 'hook-PIL.SpiderImagePlugin.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+14825 INFO: Processing standard module hook 'hook-_tkinter.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+14829 WARNING: Hidden import "jinja2" not found!
+14883 INFO: Processing standard module hook 'hook-lxml.objectify.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+14895 INFO: Performing binary vs. data reclassification (534 entries)
+14920 INFO: Looking for ctypes DLLs
+14943 WARNING: Library user32 required via ctypes not found
+14957 WARNING: Library msvcrt required via ctypes not found
+14986 INFO: Analyzing run-time hooks ...
+14992 INFO: Including run-time hook 'pyi_rth_inspect.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+14993 INFO: Including run-time hook 'pyi_rth__tkinter.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+14994 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+14995 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+14996 INFO: Including run-time hook 'pyi_rth_setuptools.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+14996 INFO: Including run-time hook 'pyi_rth_cryptography_openssl.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/rthooks'
+15048 INFO: Creating base_library.zip...
+15059 INFO: Looking for dynamic libraries
+15587 INFO: Warnings written to /home/dev/project/everythingmarkdown/build/pyinstaller/everythingmarkdown-p0/warn-everythingmarkdown-p0.txt
+15639 INFO: Graph cross-reference written to /home/dev/project/everythingmarkdown/build/pyinstaller/everythingmarkdown-p0/xref-everythingmarkdown-p0.html
+15662 INFO: checking PYZ
+15662 INFO: Building PYZ because PYZ-00.toc is non existent
+15662 INFO: Building PYZ (ZlibArchive) /home/dev/project/everythingmarkdown/build/pyinstaller/everythingmarkdown-p0/PYZ-00.pyz
+16506 INFO: Building PYZ (ZlibArchive) /home/dev/project/everythingmarkdown/build/pyinstaller/everythingmarkdown-p0/PYZ-00.pyz completed successfully.
+16524 INFO: checking PKG
+16524 INFO: Building PKG because PKG-00.toc is non existent
+16524 INFO: Building PKG (CArchive) everythingmarkdown-p0.pkg
+16538 INFO: Building PKG (CArchive) everythingmarkdown-p0.pkg completed successfully.
+16539 INFO: Bootloader /home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/bootloader/Linux-64bit-intel/run
+16539 INFO: checking EXE
+16539 INFO: Building EXE because EXE-00.toc is non existent
+16539 INFO: Building EXE from EXE-00.toc
+16539 INFO: Copying bootloader EXE to /home/dev/project/everythingmarkdown/build/pyinstaller/everythingmarkdown-p0/everythingmarkdown-p0
+16539 INFO: Appending PKG archive to custom ELF section in EXE
+16565 INFO: Building EXE from EXE-00.toc completed successfully.
+16570 INFO: checking COLLECT
+16570 INFO: Building COLLECT because COLLECT-00.toc is non existent
+16570 INFO: Removing dir /home/dev/project/everythingmarkdown/dist/everythingmarkdown-p0
+16605 INFO: Building COLLECT COLLECT-00.toc
+16742 INFO: Building COLLECT COLLECT-00.toc completed successfully.
+16748 INFO: Build complete! The results are available in: /home/dev/project/everythingmarkdown/dist
+26 INFO: PyInstaller: 6.22.2, contrib hooks: 2026.7
+26 INFO: Python: 3.12.13
+27 INFO: Platform: Linux-5.14.0-687.17.1.el9_8.x86_64-x86_64-with-glibc2.34
+27 INFO: Python environment: /home/dev/project/everythingmarkdown/.venv
+28 INFO: wrote /home/dev/project/everythingmarkdown/build/everythingmarkdown-p0-gui.spec
+29 INFO: Removing temporary files and cleaning cache in /home/dev/.cache/pyinstaller
+37 INFO: Module search paths (PYTHONPATH):
+['/home/dev/project/everythingmarkdown',
+ '/home/dev/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python312.zip',
+ '/home/dev/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12',
+ '/home/dev/.local/share/uv/python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/lib-dynload',
+ '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages',
+ '/home/dev/project/everythingmarkdown/src',
+ '/home/dev/project/everythingmarkdown/packaging',
+ '/home/dev/project/everythingmarkdown/src']
+164 INFO: Appending 'datas' from .spec
+165 INFO: checking Analysis
+165 INFO: Building Analysis because Analysis-00.toc is non existent
+165 INFO: Looking for Python shared library...
+170 INFO: Using Python shared library: /home/dev/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/lib/libpython3.12.so.1.0
+170 INFO: Running Analysis Analysis-00.toc
+170 INFO: Target bytecode optimization level: 0
+170 INFO: Initializing module dependency graph...
+170 INFO: Initializing module graph hook caches...
+174 INFO: Analyzing modules for base_library.zip ...
+601 INFO: Processing standard module hook 'hook-encodings.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+755 INFO: Processing standard module hook 'hook-math.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+1730 INFO: Processing standard module hook 'hook-pickle.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+2763 INFO: Processing standard module hook 'hook-heapq.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+2960 INFO: Caching module dependency graph...
+2979 INFO: Analyzing /home/dev/project/everythingmarkdown/packaging/p0_gui.py
+3008 INFO: Processing standard module hook 'hook-platform.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3029 INFO: Processing standard module hook 'hook-urllib3.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+3259 INFO: Processing pre-safe-import-module hook 'hook-backports.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+3259 INFO: SetuptoolsInfo: initializing cached setuptools info...
+3413 INFO: Setuptools: 'backports' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.backports'!
+3417 INFO: Processing standard module hook 'hook-setuptools.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3422 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+3447 INFO: Processing standard module hook 'hook-sysconfig.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3451 INFO: Processing pre-safe-import-module hook 'hook-jaraco.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+3451 INFO: Setuptools: 'jaraco' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco'!
+3456 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+3456 INFO: Setuptools: 'more_itertools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.more_itertools'!
+3528 INFO: Processing standard module hook 'hook-_osx_support.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3530 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+3682 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3726 INFO: Processing standard module hook 'hook-xml.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+3841 INFO: Processing standard module hook 'hook-_ctypes.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+4017 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+4180 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+4181 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+4540 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+4540 INFO: Setuptools: 'tomli' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.tomli'!
+4850 INFO: Processing pre-safe-import-module hook 'hook-wheel.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+4850 INFO: Setuptools: 'wheel' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.wheel'!
+5128 INFO: Processing standard module hook 'hook-certifi.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+5155 INFO: Processing standard module hook 'hook-charset_normalizer.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+5229 INFO: Processing standard module hook 'hook-cryptography.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+5463 INFO: hook-cryptography: cryptography does not seem to be using dynamically linked OpenSSL.
+5650 INFO: Processing standard module hook 'hook-numpy.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+6100 INFO: Processing standard module hook 'hook-webbrowser.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+6839 INFO: Processing standard module hook 'hook-difflib.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+7261 INFO: Processing standard module hook 'hook-onnxruntime.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+7467 INFO: Processing standard module hook 'hook-xml.dom.domreg.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+7817 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+8026 INFO: Processing standard module hook 'hook-lxml.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+8118 INFO: Processing standard module hook 'hook-lxml.etree.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+8309 INFO: Processing standard module hook 'hook-pdfminer.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+8614 INFO: Processing standard module hook 'hook-PIL.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+8670 INFO: Processing standard module hook 'hook-PIL.Image.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+8851 INFO: Processing standard module hook 'hook-PIL.ImageFilter.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+8964 INFO: Processing standard module hook 'hook-pandas.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+9538 INFO: Processing standard module hook 'hook-zoneinfo.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+10312 INFO: Processing standard module hook 'hook-pandas.io.formats.style.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+11405 INFO: Processing standard module hook 'hook-pandas.plotting.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+11676 INFO: Processing standard module hook 'hook-dateutil.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+11729 INFO: Processing pre-safe-import-module hook 'hook-six.moves.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_safe_import_module'
+12251 INFO: Processing standard module hook 'hook-openpyxl.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+13379 INFO: Processing standard module hook 'hook-sqlite3.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+13474 INFO: Processing standard module hook 'hook-pandas.io.clipboard.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+13834 INFO: Processing standard module hook 'hook-pypdfium2.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+13837 INFO: Processing standard module hook 'hook-pypdfium2_raw.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+14011 INFO: Processing standard module hook 'hook-pptx.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+14607 INFO: Processing pre-find-module-path hook 'hook-tkinter.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/pre_find_module_path'
+14608 INFO: TclTkInfo: initializing cached Tcl/Tk info...
+14719 INFO: Processing standard module hook 'hook-_tkinter.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+14741 INFO: Processing module hooks (post-graph stage)...
+14851 INFO: Processing standard module hook 'hook-lxml.isoschematron.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+14996 INFO: Processing standard module hook 'hook-PIL.SpiderImagePlugin.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+15018 INFO: Processing standard module hook 'hook-_tkinter.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks'
+15022 WARNING: Hidden import "jinja2" not found!
+15076 INFO: Processing standard module hook 'hook-lxml.objectify.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/stdhooks'
+15120 INFO: Performing binary vs. data reclassification (534 entries)
+15145 INFO: Looking for ctypes DLLs
+15167 WARNING: Library user32 required via ctypes not found
+15179 WARNING: Library msvcrt required via ctypes not found
+15207 INFO: Analyzing run-time hooks ...
+15213 INFO: Including run-time hook 'pyi_rth_inspect.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+15215 INFO: Including run-time hook 'pyi_rth__tkinter.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+15215 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+15217 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+15218 INFO: Including run-time hook 'pyi_rth_setuptools.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/hooks/rthooks'
+15218 INFO: Including run-time hook 'pyi_rth_cryptography_openssl.py' from '/home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/_pyinstaller_hooks_contrib/rthooks'
+15240 INFO: Creating base_library.zip...
+15252 INFO: Looking for dynamic libraries
+15724 INFO: Warnings written to /home/dev/project/everythingmarkdown/build/pyinstaller/everythingmarkdown-p0-gui/warn-everythingmarkdown-p0-gui.txt
+15772 INFO: Graph cross-reference written to /home/dev/project/everythingmarkdown/build/pyinstaller/everythingmarkdown-p0-gui/xref-everythingmarkdown-p0-gui.html
+15797 INFO: checking PYZ
+15797 INFO: Building PYZ because PYZ-00.toc is non existent
+15797 INFO: Building PYZ (ZlibArchive) /home/dev/project/everythingmarkdown/build/pyinstaller/everythingmarkdown-p0-gui/PYZ-00.pyz
+16644 INFO: Building PYZ (ZlibArchive) /home/dev/project/everythingmarkdown/build/pyinstaller/everythingmarkdown-p0-gui/PYZ-00.pyz completed successfully.
+16662 INFO: checking PKG
+16662 INFO: Building PKG because PKG-00.toc is non existent
+16662 INFO: Building PKG (CArchive) everythingmarkdown-p0-gui.pkg
+16676 INFO: Building PKG (CArchive) everythingmarkdown-p0-gui.pkg completed successfully.
+16676 INFO: Bootloader /home/dev/project/everythingmarkdown/.venv/lib/python3.12/site-packages/PyInstaller/bootloader/Linux-64bit-intel/run
+16676 INFO: checking EXE
+16676 INFO: Building EXE because EXE-00.toc is non existent
+16676 INFO: Building EXE from EXE-00.toc
+16676 INFO: Copying bootloader EXE to /home/dev/project/everythingmarkdown/build/pyinstaller/everythingmarkdown-p0-gui/everythingmarkdown-p0-gui
+16676 INFO: Appending PKG archive to custom ELF section in EXE
+16712 INFO: Building EXE from EXE-00.toc completed successfully.
+16717 INFO: checking COLLECT
+16717 INFO: Building COLLECT because COLLECT-00.toc is non existent
+16717 INFO: Removing dir /home/dev/project/everythingmarkdown/dist/everythingmarkdown-p0-gui
+16751 INFO: Building COLLECT COLLECT-00.toc
+16875 INFO: Building COLLECT COLLECT-00.toc completed successfully.
+16880 INFO: Build complete! The results are available in: /home/dev/project/everythingmarkdown/dist

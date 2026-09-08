@@ -1,0 +1,29 @@
+# Agent-local state (keep out of version control at any depth)
+.omx/
+.omc/
+
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local builds and conversion output
+build/
+dist/
+convert_result/
+
+# Local settings and OS metadata
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

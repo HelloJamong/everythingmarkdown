@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=77,<83"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "everythingmarkdown"
+version = "0.0.0"
+description = "Local Markdown conversion for Windows and macOS (P0 feasibility probe)"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = ["markitdown[pdf,docx,pptx,xlsx]==0.1.7"]
+
+[project.scripts]
+everythingmarkdown-p0 = "everythingmarkdown.p0:main"
+
+[project.gui-scripts]
+everythingmarkdown-p0-gui = "everythingmarkdown.p0:gui_main"
+
+[dependency-groups]
+build = ["pyinstaller>=6,<7"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

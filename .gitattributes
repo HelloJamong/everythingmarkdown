@@ -1,0 +1,5 @@
+# Generated document fixtures are binary; preserve bytes and avoid text diffs.
+*.pdf binary
+*.docx binary
+*.pptx binary
+*.xlsx binary

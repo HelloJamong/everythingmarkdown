@@ -1,0 +1,20 @@
+test_cli_cancellation (test_p0.P0Tests.test_cli_cancellation) ... ok
+test_cli_does_not_leak_document_exception (test_p0.P0Tests.test_cli_does_not_leak_document_exception) ... ok
+test_cli_empty_input (test_p0.P0Tests.test_cli_empty_input) ... ok
+test_cli_fixture_report (test_p0.P0Tests.test_cli_fixture_report) ... ok
+test_cli_interactive_path (test_p0.P0Tests.test_cli_interactive_path) ... ok
+test_cli_non_tty_does_not_wait (test_p0.P0Tests.test_cli_non_tty_does_not_wait) ... ok
+test_disguised_zip_rejected_before_engine (test_p0.P0Tests.test_disguised_zip_rejected_before_engine) ... ok
+test_empty_engine_result_rejected (test_p0.P0Tests.test_empty_engine_result_rejected) ... ok
+test_invalid_paths (test_p0.P0Tests.test_invalid_paths) ... ok
+test_nonzip_office_rejected (test_p0.P0Tests.test_nonzip_office_rejected) ... ok
+test_registers_only_selected_converter (test_p0.P0Tests.test_registers_only_selected_converter) ... ok
+test_seven_real_formats_without_python_socket_attempts (test_p0.P0Tests.test_seven_real_formats_without_python_socket_attempts) ... ok
+test_size_limit (test_p0.P0Tests.test_size_limit) ... ok
+test_symlink_rejected (test_p0.P0Tests.test_symlink_rejected) ... ok
+test_uppercase_unicode_space_name (test_p0.P0Tests.test_uppercase_unicode_space_name) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.333s
+
+OK

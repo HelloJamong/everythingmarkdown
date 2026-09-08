@@ -1,0 +1,38 @@
+{
+  "recorded_at": "2026-09-08T05:32:41.495534+00:00",
+  "p0_status": "partial; Windows/macOS and graphical display unavailable",
+  "unittest": {
+    "command": "uv run --locked python -m unittest discover -s tests -v",
+    "exit_code": 0,
+    "tests": 15
+  },
+  "compileall": {
+    "exit_code": 0,
+    "scope": "src tests scripts packaging; syntax only, not lint/typecheck"
+  },
+  "dependency_check": {
+    "command": "uv pip check",
+    "exit_code": 0,
+    "packages": 45
+  },
+  "locked_sync": {
+    "command": "uv sync --locked --group build",
+    "exit_code": 0
+  },
+  "ignore_rules": {
+    "method": "git check-ignore --no-index in temporary repository",
+    "excluded_cases": 7,
+    "retained_cases": 6
+  },
+  "frozen_alternate_cwd": {
+    "formats": 7,
+    "no_files_written": true,
+    "python_environment_variables_removed": true,
+    "exit_code": 0
+  },
+  "shared_markdown_links": "all local targets exist",
+  "original_plan_hashes": "all four unchanged",
+  "lint_typecheck": "not run; tools/configuration not selected",
+  "target_platform_builds": "not run; Windows/macOS hosts unavailable",
+  "source_and_frozen_gui": "exit 3; headless host, not a successful GUI smoke"
+}
