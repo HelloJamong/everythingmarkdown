@@ -5,8 +5,7 @@ from importlib.metadata import PackageNotFoundError
 from pathlib import Path
 from unittest.mock import patch
 
-from everythingmarkdown import ConversionError, ConversionResult, ErrorCode
-from everythingmarkdown import cli
+from everythingmarkdown import ConversionError, ConversionResult, ErrorCode, cli
 
 
 class CliTests(unittest.TestCase):

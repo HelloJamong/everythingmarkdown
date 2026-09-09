@@ -9,8 +9,8 @@ from markitdown import (
     FileConversionException,
     MissingDependencyException,
     UnsupportedFormatException,
+    converters,
 )
-from markitdown import converters
 
 from everythingmarkdown.markitdown_adapter import MarkItDownAdapter
 from everythingmarkdown.models import ConversionError, ErrorCode

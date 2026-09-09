@@ -17,10 +17,37 @@ everythingmarkdown = "everythingmarkdown.cli:main"
 everythingmarkdown-p0 = "everythingmarkdown.p0:main"
 
 [project.gui-scripts]
+everythingmarkdown-gui = "everythingmarkdown.gui:main"
 everythingmarkdown-p0-gui = "everythingmarkdown.p0:gui_main"
 
 [dependency-groups]
 build = ["pyinstaller>=6,<7"]
+dev = ["pytest>=8,<9", "ruff>=0.9,<1", "mypy>=1.13,<2"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+everythingmarkdown = ["logo.png"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["E501"]
+"scripts/**" = ["E501"]  # unavoidably long OOXML namespace literals
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src"]
+warn_redundant_casts = true
+warn_unused_ignores = true
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["markitdown.*"]
+ignore_missing_imports = true

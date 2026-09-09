@@ -1,14 +1,14 @@
 # EverythingMarkdown 진행 현황
 
-- 최종 정리일: 2026-09-08
-- 현재 단계: **P0 로컬 검증·P1 공통 코어·P2 CLI 완료 / P3 GUI 미착수 / 목표 OS 실환경 테스트는 배포 후 이관**
-- 다음 작업: P3 파일 선택·변환 GUI 구현
+- 최종 정리일: 2026-09-09
+- 현재 단계: **P0~P3 완료 / P4 진행 중(설정·문서·빌드 초안 완료, OS/CI 배포물 빌드 남음) / 목표 OS 실환경 테스트는 배포 후 이관**
+- 다음 작업: Windows/macOS 러너에서 배포물 빌드·서명, (배포 요청 시) 릴리즈 게시
 
 ## 프로젝트 목표
 
 Microsoft MarkItDown을 사용해 Windows/macOS에서 GUI와 CLI로 로컬 파일을 Markdown으로
 변환한다. 원래 파일명에서 확장자만 `.md`로 바꾸고 시작 CWD의 `convert_result`에 저장한다.
-실제 출력 저장은 P1 공통 API로, 제품용 CLI는 P2로 구현했다. 제품용 GUI는 아직 구현하지 않았다.
+실제 출력 저장은 P1 공통 API, 제품용 CLI는 P2, 제품용 GUI는 P3으로 구현했다. P4 패키징은 진행 중이다.
 
 ## 완료한 준비 작업
 
@@ -56,14 +56,31 @@ P0 프로브는 변환 성공 여부와 문자 수만 보고하며 **문서 본�
 - 의존성 추가·버전 증가·릴리즈 항목·태그 없음. 첫 배포 요청 시 `26.1.0` 정책 유지.
 - 실행 근거: [P2 검증 기록](docs/p2-validation.md).
 
+## 이번 P3 작업 (2026-09-09)
+
+- `DESIGN.md`: design.md §6 GUI 계약을 구현 스펙으로 구체화. 시각 목업 `docs/gui-mockup.html`.
+- `gui.py`: Tk 비의존 `ConversionController`(상태 기계·워커·큐) + `_TkView`(유일한 Tk 코드).
+  단일 작업 스레드 + `queue.Queue` + `after()` 폴링, 워커는 큐만 접근.
+- `everythingmarkdown-gui` 진입점 추가(P0 프로브와 분리). `assets/logo.ico` → `logo.png` 창 아이콘.
+- `test_gui.py` 16개(헤드리스) + A02 GUI/CLI 결과 일치 통합 테스트. 실제 창/키보드/배율은 배포 후로 이관.
+
+## 이번 P4 작업 — 진행 중 (2026-09-09)
+
+- lint=`ruff`, typecheck=`mypy` 채택. `pyproject.toml` 설정 + `dev` 그룹. `ruff check`·`mypy` 통과.
+- 전체 테스트 126개 통과(unittest subTest 포함). 텍스트 없는 PDF 회귀(A13) 추가.
+- `packaging/emarkdown.spec`(GUI+CLI 단일 배포 폴더, macOS `BUNDLE`), `build_release.py`(zip), `scripts/sha256sums.py`.
+- `.github/workflows/ci.yml`(lint+mypy+test), `build.yml`(Windows/macOS 빌드 초안, 수동 트리거).
+- [docs/acceptance-matrix.md](docs/acceptance-matrix.md) A01~A26 매핑, [docs/third-party-licenses.md](docs/third-party-licenses.md) 초안.
+- **2026-09-09 결정:** Windows도 설치기 없이 ZIP 배포. `docs/releasing.md`·README 개정.
+- 남음(OS/CI 필요): 실제 `.exe`/`.app` 빌드, 서명·공증, 라이선스 원문 포함, 암호화 PDF fixture.
+
 ## 아직 완료하지 않은 것
 
 - **배포 후로 이관:** Windows/macOS의 Python 미설치 환경에서 GUI/CLI 및 7개 포맷 검증. 현재 개발 선행 조건이 아님.
 - Finder/Explorer/터미널 시작 CWD와 쓰기 권한의 플랫폼별 확인.
 - 목표 환경 전체에서 의존성·패키저 최종 호환성 확정.
-- P3 파일 선택·변환 GUI, P4 통합·최종 배포 검증.
-- lint/typecheck 도구 선정·설정·실행. 현재 `compileall`은 문법 검사만 의미한다.
-- 코드서명·공증, 제3자 라이선스 고지 검토, 외부 릴리스.
+- Windows/macOS 러너에서 실제 배포물 빌드, 코드서명·공증, 제3자 라이선스 원문 포함, 외부 릴리스.
+- 암호화 PDF fixture(A12) — pypdf/pikepdf 도입 여부 결정 대기.
 
 **P0 테스트 15개 통과는 A01~A26 전체 수용 기준 통과나 Windows/macOS 지원 완료가 아니다.**
 P0 검증 당시에는 Git 작업을 수행하지 않았다. 이후 사용자 요청으로 `main` 브랜치를 초기화하고
@@ -73,7 +90,7 @@ P0 검증 당시에는 Git 작업을 수행하지 않았다. 이후 사용자 �
 ## 남은 계획과 위험
 
 1. 사용자 요청에 따라 실환경 테스트를 배포 후 별도 단계로 이관했다. 로컬 자동 테스트와 배포 파일 빌드는 유지한다.
-2. [TODO](TODO.md)의 P3 → P4 순으로 진행한다. Windows 설치 EXE, macOS 단일 `.app`을 담은 ZIP을 생성하는 것이 배포 목표다.
+2. [TODO](TODO.md)의 P4를 진행한다. Windows/macOS 모두 ZIP(폴더 / `.app`)을 생성하는 것이 배포 목표다. 설치기는 만들지 않는다.
 3. 7개 포맷·100 MiB·Windows 11 x64/macOS 14+ Apple Silicon은 현재 시험 대상 제안값이다.
 4. OCR·레이아웃 완전 재현·악성 문서 샌드박스·하드 타임아웃은 보장하지 않는다.
 5. 상태가 바뀌면 실제 실행 증거가 있는 항목만 완료로 표시한다.
@@ -82,10 +99,12 @@ P0 검증 당시에는 Git 작업을 수행하지 않았다. 이후 사용자 �
 
 - [릴리즈 정책](docs/releasing.md): 최종 Windows/macOS 배포 요구와 버전·태그·노트 계약 (구현 전 정의)
 - [changelog](changelog.md): 배포 시 작성할 릴리즈 노트. 현재 버전 항목 없음; 첫 배포는 `26.1.0`
-- [README](README.md): 설치·CLI 사용·프로브 실행 방법
+- [README](README.md): 설치·CLI/GUI 사용·빌드 방법
 - [TODO](TODO.md): 단계별 실행 체크리스트
 - [설계 기준선](docs/design.md): 원 요구사항과 세부 동작 계약
-- [검증 명세](docs/test-spec.md): A01~A26의 미래 수용 기준
+- [GUI 설계](DESIGN.md): P3 GUI 구현 스펙 · [시각 목업](docs/gui-mockup.html)
+- [검증 명세](docs/test-spec.md): A01~A26 수용 기준 · [현황 매트릭스](docs/acceptance-matrix.md)
+- [서드파티 라이선스](docs/third-party-licenses.md): 번들 의존성 라이선스 초안
 - [P0 검증 기록](docs/p0-validation.md): 초기 프로브 실행과 미검증 경계
 - [P1 검증 기록](docs/p1-validation.md): 공통 코어·파일 안전성·실제 변환 검증
 - [P2 검증 기록](docs/p2-validation.md): CLI 단위·프로세스·대화형 실행 검증

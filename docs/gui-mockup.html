@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>EverythingMarkdown GUI 목업</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" crossorigin="anonymous"></script>
+  <style> * { font-family: 'Pretendard', sans-serif; } </style>
+</head>
+<body class="bg-slate-100 text-slate-900 p-10">
+
+<!--
+  이 파일은 P3 GUI의 레이아웃·문구·상태 기준을 보여주는 정적 목업이다.
+  실제 창은 네이티브 Tkinter/ttk 위젯으로 렌더링하며, 여기 표현된
+  둥근 모서리·그림자·색상은 OS 기본 테마 안에서 근사치로만 따른다.
+  MVP 범위 밖(드래그앤드롭·출력 형식 선택·폴더 입력·할당량·네트워크)은
+  design.md §6에 따라 의도적으로 제외했다.
+-->
+
+<div class="max-w-[1180px] mx-auto">
+  <h2 class="text-lg font-bold text-slate-700 mb-1">EverythingMarkdown — P3 GUI 목업</h2>
+  <p class="text-sm text-slate-500 mb-8">단일 창 · 단건 변환 · 시작 CWD의 <code>convert_result/</code>에 저장</p>
+
+  <div class="flex flex-wrap gap-10 items-start">
+
+    <!-- 기본 창 (READY 상태) -->
+    <div class="w-[480px] bg-white shadow-xl border border-slate-200 rounded-lg flex flex-col overflow-hidden">
+      <header class="h-9 border-b border-slate-100 flex items-center px-3 gap-2 bg-slate-50 shrink-0">
+        <div class="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+        <span class="ml-2 text-xs font-medium text-slate-400">EverythingMarkdown</span>
+      </header>
+
+      <div class="p-7 flex flex-col gap-6">
+        <div>
+          <h1 class="text-xl font-bold text-slate-800">EverythingMarkdown</h1>
+          <p class="text-sm text-slate-500 mt-1">로컬 파일을 Markdown으로 변환합니다. 기존 결과는 덮어쓰지 않습니다.</p>
+        </div>
+
+        <!-- 파일 -->
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">파일</label>
+          <div class="flex gap-2">
+            <input readonly value="/home/user/docs/report.v2.docx"
+                   class="flex-1 h-10 px-3 bg-slate-50 border border-slate-200 rounded-md text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200">
+            <button class="h-10 px-4 bg-white border border-slate-300 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-50">찾아보기</button>
+          </div>
+        </div>
+
+        <!-- 저장 위치 -->
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">저장 위치</label>
+          <div class="flex gap-2 items-center">
+            <input readonly value="/home/user/work/convert_result/report.v2.md"
+                   class="flex-1 h-10 px-3 bg-slate-50 border border-slate-200 rounded-md text-[13px] font-mono text-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-200">
+            <button class="h-10 px-3 bg-white border border-slate-300 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-50"><i class="fa-regular fa-copy mr-1"></i>복사</button>
+          </div>
+        </div>
+
+        <!-- 상태 -->
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">상태</label>
+          <div class="flex items-center gap-2 text-sm text-slate-700">
+            <i class="fa-regular fa-circle-check text-slate-400"></i>
+            <span>변환할 준비가 되었습니다.</span>
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-400">지원 형식&nbsp;&nbsp;PDF · DOCX · PPTX · XLSX · HTML · CSV · TXT</p>
+
+        <!-- 액션 -->
+        <div class="flex gap-3 pt-1">
+          <button class="flex-1 h-12 bg-slate-900 text-white rounded-lg font-bold text-sm hover:bg-slate-800">변환</button>
+          <button class="w-24 h-12 bg-white border border-slate-300 text-slate-600 rounded-lg font-semibold text-sm hover:bg-slate-50">초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 상태별 표시 -->
+    <div class="w-[560px] flex flex-col gap-3">
+      <h3 class="text-sm font-bold text-slate-600">상태 기계 (상태 행 + 버튼 활성)</h3>
+
+      <div class="bg-white border border-slate-200 rounded-md p-4">
+        <p class="text-xs font-semibold text-slate-400 mb-2">1. 파일 미선택 — 시작 / 초기화 후</p>
+        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fa-regular fa-circle text-slate-300"></i><span>변환할 파일을 선택해 주세요.</span></div>
+        <div class="mt-2 flex gap-2"><span class="text-[11px] px-2 py-1 rounded bg-slate-100 text-slate-400">변환 비활성</span><span class="text-[11px] px-2 py-1 rounded bg-slate-100 text-slate-500">찾아보기 활성</span></div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-md p-4">
+        <p class="text-xs font-semibold text-slate-400 mb-2">2. 파일 선택됨 — 찾아보기 성공 (취소 시 이전 선택 유지)</p>
+        <div class="flex items-center gap-2 text-sm text-slate-700"><i class="fa-regular fa-circle-check text-slate-400"></i><span>변환할 준비가 되었습니다.</span></div>
+        <div class="mt-2 flex gap-2"><span class="text-[11px] px-2 py-1 rounded bg-slate-900 text-white">변환 활성</span><span class="text-[11px] px-2 py-1 rounded bg-slate-100 text-slate-500">저장 위치 갱신</span></div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-md p-4">
+        <p class="text-xs font-semibold text-slate-400 mb-2">3. 변환 중 — 단일 작업 스레드</p>
+        <div class="flex items-center gap-2 text-sm text-slate-700"><i class="fa-solid fa-spinner text-slate-400"></i><span>변환 중입니다…</span></div>
+        <div class="mt-2 h-1.5 w-full bg-slate-100 rounded overflow-hidden"><div class="h-full w-1/3 bg-slate-400 rounded"></div></div>
+        <div class="mt-2 flex gap-2"><span class="text-[11px] px-2 py-1 rounded bg-slate-100 text-slate-400">찾아보기 · 변환 · 초기화 비활성</span><span class="text-[11px] px-2 py-1 rounded bg-slate-100 text-slate-400">불확정 진행바</span></div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-md p-4">
+        <p class="text-xs font-semibold text-slate-400 mb-2">4. 성공 — 파일 닫기까지 성공한 후에만</p>
+        <div class="flex items-center gap-2 text-sm text-emerald-700"><i class="fa-solid fa-check text-emerald-600"></i><span>변환 완료 · convert_result/report.v2.md</span></div>
+        <div class="mt-2 flex gap-2"><span class="text-[11px] px-2 py-1 rounded bg-slate-900 text-white">변환 활성 (재변환은 충돌 안내)</span></div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-md p-4">
+        <p class="text-xs font-semibold text-slate-400 mb-2">5. 실패 — 원인 + 코드, 선택 유지, 재시도 가능</p>
+        <div class="flex items-center gap-2 text-sm text-red-700"><i class="fa-solid fa-triangle-exclamation text-red-500"></i><span>같은 이름의 결과가 이미 존재합니다. 기존 결과를 보존했습니다. (코드: OUTPUT_CONFLICT)</span></div>
+        <div class="mt-2 flex gap-2"><span class="text-[11px] px-2 py-1 rounded bg-slate-900 text-white">변환 활성</span><span class="text-[11px] px-2 py-1 rounded bg-slate-100 text-slate-500">선택 파일 유지</span></div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-md p-4">
+        <p class="text-xs font-semibold text-slate-400 mb-2">6. 변환 중 창 닫기 — 예약</p>
+        <div class="flex items-center gap-2 text-sm text-slate-700"><i class="fa-regular fa-clock text-slate-400"></i><span>변환이 끝나면 창을 닫습니다.</span></div>
+        <div class="mt-2 flex gap-2"><span class="text-[11px] px-2 py-1 rounded bg-slate-100 text-slate-500">강제 종료 · 변환 중 취소 없음</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

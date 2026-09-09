@@ -1,7 +1,7 @@
 # 최종 배포 요구와 릴리즈 정책
 
-- 작성일: 2026-09-08
-- 범위: 릴리즈 규칙 정의. 설치기 구현, 버전 메타데이터 변경, 태그 생성, 외부 배포는 이번 작업에 포함하지 않는다.
+- 작성일: 2026-09-08 (2026-09-09 개정: Windows도 ZIP 배포로 통일, 설치기 생략)
+- 범위: 릴리즈 규칙 정의. 버전 메타데이터 변경, 태그 생성, 외부 배포는 이번 작업에 포함하지 않는다.
 - 근거: 로컬 Jamong-Harvest의 `skills/versioning/SKILL.md`와 설치된 `versioning` 스킬.
 - 사용자 지정 파일명에 따라 **루트 `changelog.md`(소문자)** 하나만 사용한다. `CHANGELOG.md`를 중복 생성하지 않는다.
 
@@ -15,26 +15,28 @@
 - macOS는 `.app` 애플리케이션으로 GUI와 CUI를 모두 제공한다.
 - 사용자가 Python이나 pip 의존성을 별도로 설치하지 않아도 실행할 수 있어야 한다.
 
-사용자가 권장안을 선택한 최종 배포 형태:
+최종 배포 형태 (2026-09-09 개정 — 양 플랫폼 ZIP 통일):
 
-- Windows는 **설치용 `.exe` 하나**에 별도 GUI/CUI 실행 파일과 리소스를 담는다.
-  설치 없이 실행하는 단일 EXE의 모드 전환 방식은 채택하지 않는다.
+- Windows는 GUI `EverythingMarkdown.exe`, 콘솔 `everythingmarkdown-cli.exe`, 공통 리소스를
+  담은 폴더를 `.zip`으로 전달한다. **별도 설치기(`.exe` setup)는 만들지 않는다.**
+  사용자는 압축을 풀어 실행하며, PATH·시작 메뉴를 자동으로 바꾸지 않는다.
+  설치 없이 실행하는 단일 EXE의 모드 전환 방식도 채택하지 않는다.
 - macOS는 GUI/CUI 진입점을 포함한 단일 `.app`을 `.zip`으로 전달한다. DMG는 배포하지 않는다.
   사용자는 압축 해제 후 앱을 실행하며 `/Applications` 이동은 선택 사항이다.
+- 두 배포물 모두 [`packaging/emarkdown.spec`](../packaging/emarkdown.spec) 하나로 빌드한다.
 - Windows 11 x64 / macOS 14+ Apple Silicon은 기존 시험 대상 제안이며 실제 지원 확정은 검증 후다.
 
 ## 2. 채택한 배포 구성 — 아직 최종 바이너리 없음
 
-| 플랫폼 | 다운로드 파일 명명 규칙 | 설치/실행 후 구성 | 사용 방식 |
+| 플랫폼 | 다운로드 파일 명명 규칙 | 압축 해제 후 구성 | 사용 방식 |
 |---|---|---|---|
-| Windows | `EverythingMarkdown-<version>-windows-x64-setup.exe` | `EverythingMarkdown.exe`(GUI), `everythingmarkdown-cli.exe`(CUI), 공통 리소스 | 시작 메뉴/더블클릭 GUI; PowerShell/CMD에서 CLI 실행 |
+| Windows | `EverythingMarkdown-<version>-windows-x64.zip` | `EverythingMarkdown/` 폴더: `EverythingMarkdown.exe`(GUI), `everythingmarkdown-cli.exe`(CUI), `_internal/` 공통 리소스 | 더블클릭 GUI; PowerShell/CMD에서 `everythingmarkdown-cli.exe` 실행 |
 | macOS | `EverythingMarkdown-<version>-macos-arm64.zip` | `EverythingMarkdown.app`, 앱 번들 내부의 GUI/CLI 실행 진입점 | Finder 더블클릭 GUI; 터미널에서 번들 내부 CLI 직접 실행 |
 
 예상 사용 예이며 현재 P0 명령을 대체하지 않는다:
 
 ```powershell
-# 실제 설치 위치는 설치기 정책 확정 시 안내한다.
-& "<설치 경로>\everythingmarkdown-cli.exe" ".\report.docx"
+& "<압축 해제 경로>\EverythingMarkdown\everythingmarkdown-cli.exe" ".\report.docx"
 ```
 
 ```sh
@@ -44,14 +46,15 @@
 - Windows에서 GUI는 불필요한 콘솔 없이, CLI는 stdin/stdout/stderr·파이프·종료 코드가 정상 동작해야 한다.
   PyInstaller의 console/windowed 구분을 따른다. [공식 사용법](https://pyinstaller.org/en/stable/usage.html)
 - GUI windowed 빌드에 단순히 `--cli` 인자를 추가하는 대신 console 진입점을 분리해
-  콘솔 연결/숨김과 셸 대기 동작을 검증한다. 단일 무설치 EXE는 이번 배포 범위가 아니다.
+  콘솔 연결/숨김과 셸 대기 동작을 검증한다. 모드 전환식 단일 EXE는 채택하지 않는다.
 - macOS CLI는 Finder나 `open`을 경유하지 않고 번들 안의 실행 파일을 직접 호출한다.
   셸 별칭/심볼릭 링크는 편의 기능이며 PATH나 시스템 경로를 자동 변경하지 않는다.
   `.app` 내부 실행 파일의 터미널 실행은 [PyInstaller 동작 설명](https://pyinstaller.org/en/stable/operating-mode.html)을 참고한다.
-- 앱의 CLI helper와 런타임을 함께 패키징해야 한다. 현재 `packaging/build_p0.py`가 만드는 분리된
-  P0 배포물은 최종 단일 앱 번들 구현이 아니다.
-- Windows 설치 EXE를 만들기 위해 PyInstaller 결과를 담는 설치기 단계가 추가로 필요하다.
-  설치기 도구·추가 의존성·자동 업데이트는 아직 선택하거나 도입하지 않는다.
+- 앱의 CLI helper와 런타임을 함께 패키징해야 한다. `packaging/emarkdown.spec`이 GUI/CLI를
+  한 배포 폴더(`COLLECT`, macOS는 `BUNDLE`)에 담는다. `packaging/build_p0.py`가 만드는 분리된
+  P0 배포물은 최종 배포물이 아니다.
+- Windows는 ZIP 배포이므로 별도 설치기 도구·자동 업데이트는 도입하지 않는다.
+  `packaging/build_release.py`가 `emarkdown.spec` 빌드 결과 폴더를 그대로 `.zip`으로 압축한다.
 - 시작 CWD를 저장 기준으로 삼는 기존 계약을 유지한다. 설치 디렉터리나 앱 내부로 CWD를 변경하지 않는다.
 
 ## 3. 버전 규칙

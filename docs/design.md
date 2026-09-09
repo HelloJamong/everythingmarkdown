@@ -79,7 +79,7 @@ packaging/
   windows.spec
   macos.spec
 README.md
-DESIGN.md               # 향후 GUI 구현 시 이 문서의 UI 계약을 구체화
+DESIGN.md               # P3 GUI 구현 스펙 (이 문서 §6 계약을 구체화)
 ```
 
 - `ConversionRequest(input_path: Path, launch_dir: Path)` → `ConversionResult(output_path: Path, warnings: tuple[str, ...])`.
@@ -106,7 +106,7 @@ DESIGN.md               # 향후 GUI 구현 시 이 문서의 UI 계약을 구�
 
 ## 5. CLI 계약
 
-P2 구현과 현재 실행 근거는 [CLI 검증 기록](p2-validation.md)을 따른다. 첫 배포 전 `--version`은 숫자 대신 개발 상태를 표시한다. 아래 `everythingmarkdown-gui`는 P3 예정 진입점이며 아직 제공하지 않는다.
+P2 구현과 현재 실행 근거는 [CLI 검증 기록](p2-validation.md)을 따른다. 첫 배포 전 `--version`은 숫자 대신 개발 상태를 표시한다. `everythingmarkdown-gui`는 P3에서 구현했다([GUI 설계](../DESIGN.md)).
 
 ```text
 everythingmarkdown ./report.docx

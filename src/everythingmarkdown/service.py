@@ -26,6 +26,12 @@ class Converter(Protocol):
     def convert(self, path: Path) -> str: ...
 
 
+def output_path_for(launch_dir: Path, input_path: Path) -> Path:
+    """The .md path a successful conversion writes to. Shared with the GUI preview."""
+    base = input_path if input_path.is_absolute() else launch_dir / input_path
+    return launch_dir / "convert_result" / (base.stem + ".md")
+
+
 class ConversionService:
     def __init__(self, adapter: Converter | None = None) -> None:
         self._adapter = adapter if adapter is not None else MarkItDownAdapter()
@@ -41,7 +47,7 @@ class ConversionService:
         if not path.is_absolute():
             path = launch_dir / path
         _validate_input(path)
-        output = launch_dir / "convert_result" / (path.stem + ".md")
+        output = output_path_for(launch_dir, path)
         _prepare_output(output)
         try:
             markdown = self._adapter.convert(path)

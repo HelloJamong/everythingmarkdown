@@ -105,7 +105,7 @@ class CliIntegrationTests(unittest.TestCase):
             ) as process:
                 os.close(slave)
                 slave = None
-                os.write(master, f'"{source.name}"\n'.encode("utf-8"))
+                os.write(master, f'"{source.name}"\n'.encode())
                 try:
                     stdout, stderr = process.communicate(timeout=15)
                 except subprocess.TimeoutExpired:
