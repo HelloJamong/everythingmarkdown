@@ -4,6 +4,11 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+try:
+    import tkinter as _tkinter
+except ImportError:  # headless CI images often ship Python without _tkinter
+    _tkinter = None
+
 from everythingmarkdown.gui import (
     CONFLICT_HINT,
     NO_TK,
@@ -221,11 +226,10 @@ class GuiControllerTests(unittest.TestCase):
             self.assertEqual(3, main())
         self.assertIn(NO_TK, [a[0] for a in captured if a])
 
+    @unittest.skipUnless(_tkinter is not None, "tkinter unavailable; ImportError path covered separately")
     def test_main_returns_three_without_a_display(self):
-        import tkinter
-
         captured = []
-        with patch("tkinter.Tk", side_effect=tkinter.TclError("no display name")), \
+        with patch("tkinter.Tk", side_effect=_tkinter.TclError("no display name")), \
              patch("sys.stderr"), \
              patch("builtins.print", lambda *a, **k: captured.append(a)):
             self.assertEqual(3, main())
