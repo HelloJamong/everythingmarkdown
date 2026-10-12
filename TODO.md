@@ -2,7 +2,7 @@
 
 - 최종 정리일: 2026-10-12
 - 제품: **개인용 웹 서비스**. 배포물은 Docker Hub의 통합 웹 서비스 이미지 하나다.
-- 현재 상태: 변환 코어·웹 P1~P4 완료. **다음은 웹 P5(Docker)**, 웹 P6 미착수.
+- 현재 상태: 변환 코어·웹 P1~P5 완료. **다음은 웹 P6(통합 검증·운영 문서)**. 배포는 버전 태그 푸시로 시작한다.
 - 관련 문서: [진행 현황](PROGRESS.md) · [웹 서비스 설계·계획](docs/web-service-plan.md) · [릴리즈 정책](docs/releasing.md) · [P1 코어 검증](docs/p1-validation.md)
 - 2026-10-12 결정:
   - 데스크톱 GUI·CLI·P0 프로브·PyInstaller 패키징 폐기(Git 이력에 보존).
@@ -22,8 +22,8 @@
 | 웹 P2 인증 | 완료 | |
 | 웹 P3 업로드·변환·보관 | 완료 | 일부 계약 보류(아래) |
 | 웹 P4 화면 | 완료 | |
-| 웹 P5 Docker | **다음** | `Dockerfile` 작성 후 Docker Hub 첫 푸시 |
-| 웹 P6 통합 검증·운영 문서 | 미착수 | |
+| 웹 P5 Docker | 완료 | Docker Hub 첫 푸시는 첫 릴리즈 태그에서 |
+| 웹 P6 통합 검증·운영 문서 | **다음** | |
 | 릴리즈 | 사용자 배포 요청 대기 | |
 
 ## 변환 코어 — 완료
@@ -70,27 +70,28 @@
 - [x] `tests/web/test_views.py` 4개 테스트, Playwright(Chromium)로 1280px·390px 전체 흐름(로그인 실패→로그인→업로드→결과→다운로드→실패→기록 삭제→거절→만료→로그아웃)과 HTML·스크립트가 든 파일명·문서가 실행되지 않음을 확인.
 - [ ] 웹폰트 미사용: 목업의 IBM Plex 대신 시스템 글꼴(맑은 고딕·Apple SD 산돌고딕 Neo 등)을 쓴다. 목업과 같은 글꼴이 필요하면 OFL 폰트를 `web/static`에 넣는다(이미지 용량 증가).
 
-## 웹 P5 — Docker 및 배포 구성
+## 웹 P5 — Docker 및 배포 구성 (완료)
 
-- [ ] `Dockerfile`(Python 3.12, 잠긴 의존성, 비루트, healthcheck, TLS 미포함), `compose.yaml`(`./data:/data`, `./logs:/logs`), `.dockerignore`, `.env.example`.
-- [ ] `docs/web-deployment.md`: nginx 리버스 프록시 연결 예시(HTTPS는 프록시에서 종료)·forwarded 헤더 신뢰 범위·`.env` 권한.
-- [ ] 이미지 build/up/health, 재시작 후 데이터 유지 검증.
+- [x] `Dockerfile`(python:3.12-slim 2단계, `uv sync --locked --no-dev`, UID 10001 비루트, healthcheck, TLS 미포함, 728 MB), `compose.yaml`(`./data:/data`, `./logs:/logs`, 127.0.0.1 바인딩, 읽기 전용 rootfs·`/tmp` tmpfs, capability 전부 제거, no-new-privileges, 메모리 2 GB·CPU 2·PID 256), 허용 목록 방식 `.dockerignore`, `.env.example`.
+- [x] [docs/web-deployment.md](docs/web-deployment.md): 태그 배포 흐름, 서버 준비, nginx 예시(`Host`·`X-Forwarded-*`·업로드 한도·수신 시간), `FORWARDED_ALLOW_IPS`, digest 갱신 스크립트, rollback, 백업.
+- [x] 로컬 이미지 build → compose up → healthy, 로그인·PDF 업로드·변환·미리보기, 재시작 후 이전 쿠키 401·보관 결과 다운로드 200, 비루트·읽기 전용 확인. `APP_PASSWORD` 누락·로그 디렉터리 쓰기 불가 시 시작 거부 확인.
 - [x] `build.yml` Docker job을 `linux/amd64`로 고정.
-- [ ] 공개 저장소이므로 이미지 레이어에 비밀·`.env`·데이터가 없는지 확인.
-- [ ] `build.yml` 첫 실행으로 Docker Hub 로그인·빌드·푸시 확인. 버전이 `0.0.0`이면 실행 금지.
-- [ ] 배포 서버의 digest 기반 자동 업데이트 구성(Watchtower 미사용).
+- [x] 이미지에 `.env`·`app.db`·로그 없음, `/data`·`/logs` 비어 있음, 레이어 명령에 비밀 문자열 없음 확인.
+- [x] `build.yml`: `YY.메이저.마이너` 태그 푸시로 시작 → `ci.yml` 검사 → 태그·`pyproject.toml` 버전·`changelog.md` 항목 일치 확인 → `latest`·버전 태그 푸시. 수동 실행 제거.
+- [ ] `build.yml` 첫 실행(첫 릴리즈 태그)으로 Docker Hub 로그인·빌드·푸시 확인.
+- [ ] 배포 서버에 digest 갱신 스크립트(cron) 설치(Watchtower 미사용). 스크립트 예시는 배포 문서에 있음.
 
 ## 웹 P6 — 통합 검증과 운영 문서
 
 - [ ] 웹 A01~A25 수용 기준 검증 및 lint/typecheck/회귀/컨테이너 smoke 기록.
-- [ ] DB 백업/복원, 이미지 rollback 절차 문서화.
+- [x] DB 백업, 이미지 rollback 절차 문서화(배포 문서 4·5장). 복원 실습은 미실행.
 - [ ] 실제 도메인·nginx 위치(같은 Docker 네트워크/호스트/다른 서버)·호스트 자원 확인(현재 미확인).
 - [ ] 이미지에 포함되는 의존성 라이선스 고지 확정([목록 초안](docs/third-party-licenses.md)).
 
 ## 최초 릴리즈 — 사용자 배포 요청 후에만
 
 - [ ] `changelog.md`에 `26.1.0`과 실제 배포 날짜·변경 내역·미검증 범위 작성, `pyproject.toml` 버전 일치.
-- [ ] 릴리즈 커밋·annotated tag·push, `build.yml`로 `latest`·`26.1.0` 이미지 푸시.
+- [ ] 릴리즈 커밋·annotated tag `26.1.0` push → `build.yml`이 `latest`·`26.1.0` 이미지 푸시, 두 태그 digest 일치 확인.
 - [ ] 동일 노트로 GitHub Release 게시.
 
 ## 후속 검토 — MVP 필수 작업 아님

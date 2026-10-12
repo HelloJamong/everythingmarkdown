@@ -1,8 +1,8 @@
 # EverythingMarkdown 진행 현황
 
 - 최종 정리일: 2026-10-12
-- 현재 단계: **변환 코어·웹 P1~P4 완료 / 웹 P5~P6 미착수**
-- 다음 작업: 웹 P5(Docker 이미지·compose·배포 문서)
+- 현재 단계: **변환 코어·웹 P1~P5 완료 / 웹 P6 미착수**
+- 다음 작업: 웹 P6(수용 기준 검증·라이선스 고지), 이후 사용자 요청 시 첫 릴리즈 `26.1.0`
 
 ## 프로젝트 목표
 
@@ -16,9 +16,9 @@ HTTPS는 nginx 등 리버스 프록시에서 처리한다. 설계 기준: [웹 �
 |---|---|
 | 변환 코어 `models`·`service`·`markitdown_adapter` | 완료. 7개 포맷, 입력 검증, UTF-8/LF 저장, 네트워크 미사용 |
 | 웹 앱 `src/everythingmarkdown/web/` | 인증, 작업 API(업로드·상태·미리보기·다운로드·삭제), 자식 프로세스 변환, 보관·정리, JSON 로그 완료. 업로드·결과 화면 완료 |
-| Docker `Dockerfile`·`compose.yaml` | 미착수 |
-| CI `ci.yml` | ruff·mypy·pytest, `main` push마다 실행 |
-| 배포 `build.yml` | Docker Hub 빌드·푸시 job(수동). `Dockerfile` 전까지 실패 |
+| Docker `Dockerfile`·`compose.yaml` | 완료. 로컬 build/up/health·재시작 검증 |
+| CI `ci.yml` | ruff·mypy·pytest, `main` push마다 실행, `build.yml`에서도 재사용 |
+| 배포 `build.yml` | 버전 태그 푸시 시 검사 → 버전 일치 확인 → `latest`·버전 이미지 푸시. 아직 실행 전 |
 | Docker Hub | 공개 저장소, `linux/amd64` 단일 이미지. 시크릿 `DOCKERHUB_USERNAME`·`DOCKERHUB_TOKEN` 등록 확인 |
 
 ## 이력 요약
@@ -65,6 +65,12 @@ HTTPS는 nginx 등 리버스 프록시에서 처리한다. 설계 기준: [웹 �
 - 보관 정책과 업로드 한도는 서버 설정에서 화면에 표시.
 - 웹폰트 대신 시스템 글꼴을 사용해 외부 요청이 없다.
 - 테스트 98개 통과(웹 37개), Playwright로 데스크톱·모바일 흐름과 HTML 삽입 무해화 확인. 개발 서버에 한글 글꼴이 없어 스크린샷의 한글은 깨져 보였고 텍스트 내용은 DOM으로 확인함.
+
+## 웹 P5 완료 내용 (2026-10-12)
+
+- `Dockerfile`·`.dockerignore`·`compose.yaml`·`.env.example`, [배포 문서](docs/web-deployment.md) 작성.
+- 배포 트리거를 수동 실행에서 **버전 태그 푸시**로 변경. 태그와 `pyproject.toml` 버전·`changelog.md` 항목이 다르면 이미지를 푸시하지 않는다.
+- 로컬 Docker로 빌드·실행·재시작·보안 설정·이미지 내용 검사 완료. Docker Hub 푸시는 첫 릴리즈 태그에서 처음 실행된다.
 
 ## 남은 위험
 

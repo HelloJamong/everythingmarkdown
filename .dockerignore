@@ -1,0 +1,10 @@
+# Allowlist: the image is public, so only what the build needs enters the context.
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!LICENSE
+!docs/third-party-licenses.md
+!src/
+**/__pycache__
+**/*.py[cod]

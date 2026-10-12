@@ -29,8 +29,8 @@ Docker 이미지 하나로 배포하며, 본인만 로그인해 파일을 올리
 |---|---|---|
 | `src/everythingmarkdown/{models,service,markitdown_adapter}.py` | 변환 코어: 입력 검증, MarkItDown 호출, UTF-8/LF 저장 | 구현 완료 |
 | `src/everythingmarkdown/web/` | 웹 앱 (FastAPI) | 인증·작업 API·변환·보관·로그·화면 완료 |
-| `Dockerfile`, `compose.yaml` | 통합 웹 서비스 이미지·실행 구성 | 미착수 |
-| `.github/workflows/build.yml` | Docker Hub 이미지 빌드·푸시 (수동 실행) | 초안 |
+| `Dockerfile`, `compose.yaml` | 통합 웹 서비스 이미지·실행 구성 ([배포 문서](docs/web-deployment.md)) | 완료 |
+| `.github/workflows/build.yml` | 버전 태그 푸시 시 Docker Hub 이미지 빌드·푸시 | 완료(첫 실행 전) |
 
 ## 개발 환경
 

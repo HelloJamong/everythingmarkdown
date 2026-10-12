@@ -1,0 +1,24 @@
+# Runtime settings come from .env (copy .env.example). See docs/web-deployment.md.
+services:
+  everythingmarkdown:
+    image: ${EMD_IMAGE:-everythingmarkdown:local}
+    env_file: .env
+    # Run as the owner of ./data and ./logs so bind mounts are writable without sudo.
+    user: "${EMD_UID:-10001}:${EMD_GID:-10001}"
+    # Loopback only: the reverse proxy on this host forwards to it. Never publish it publicly.
+    ports:
+      - "127.0.0.1:${EMD_PORT:-8000}:8000"
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    # Proposed limits; tune after measuring on the real host.
+    mem_limit: 2g
+    cpus: 2
+    pids_limit: 256
+    restart: unless-stopped

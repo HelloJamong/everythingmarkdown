@@ -19,10 +19,11 @@
 | 저장소 | Docker Hub `<DOCKERHUB_USERNAME>/everythingmarkdown` — **공개 저장소**(2026-10-12 확인) |
 | CPU 아키텍처 | `linux/amd64` 단일 이미지(2026-10-12 결정) |
 | 태그 | `latest`와 버전 태그(`YY.메이저.마이너`)를 **같은 빌드에서 함께** 푸시 |
-| 빌드 | `.github/workflows/build.yml`의 `docker` job(수동 실행). 시크릿 `DOCKERHUB_USERNAME`·`DOCKERHUB_TOKEN` |
+| 빌드 | **버전 태그 푸시**로 `.github/workflows/build.yml` 실행(2026-10-12 결정): `ci.yml` 검사 → 태그·`pyproject.toml` 버전·`changelog.md` 항목 일치 확인 → 푸시. 시크릿 `DOCKERHUB_USERNAME`·`DOCKERHUB_TOKEN` |
 | 서버 갱신 | `latest` digest 변경 감지 후 `docker compose pull && docker compose up -d`. **Watchtower는 사용하지 않는다** |
 
-- 버전 태그는 `pyproject.toml`의 `version`에서 읽는다. 릴리즈 커밋의 버전과 이미지 태그가 일치해야 한다.
+- 이미지 버전 태그는 Git 태그 이름을 쓴다. 워크플로가 `pyproject.toml`의 `version`과 다르면 중단하므로 릴리즈 커밋의 버전과 이미지 태그가 항상 일치한다.
+- `YY.메이저.마이너` 형식이 아닌 태그(`v26.1.0`, `26.1.0-rc1` 등)는 워크플로를 시작하지 않는다. 운영 절차는 [배포 문서](web-deployment.md).
 - digest 감지 방식(diun, cron 폴링 스크립트 등)은 배포 서버 구성 시 결정한다.
 - 이미지에는 `.env`·`data/`·`logs/`·비밀 값을 포함하지 않는다(`.dockerignore`). 공개 저장소이므로 누구나 이미지 레이어를 내려받아 볼 수 있다는 전제로 검사한다.
 
@@ -45,8 +46,8 @@ Jamong-Harvest의 versioning 규칙을 따른다. SemVer의 호환성 의미와 
 - 이미지 태그·지원 CPU 아키텍처, 검증 결과, 알려진 제한·호환성 주의사항도 해당 버전 섹션에 기록한다.
 - 현재 릴리즈 이력은 없다. 이전에 작성했던 미배포 버전 항목은 사용자 요청으로 제거했으며 개발 이력은 PROGRESS/TODO와 Git 이력에 보존한다.
 - 최초 버전 항목은 배포 시점에 `## [26.1.0] - <실제 배포 날짜>`로 작성한다.
-- 현재 `pyproject.toml`의 `0.0.0`은 임시 메타데이터다. `build.yml`이 이 값을 이미지 버전 태그로 쓰므로
-  배포 전 반드시 릴리즈 버전으로 맞추고 `uv.lock`과 이미지 태그를 검증한다.
+- 현재 `pyproject.toml`의 `0.0.0`은 임시 메타데이터다. 태그와 다르면 `build.yml`이 중단하므로
+  릴리즈 커밋에서 버전을 맞추고 `uv.lock`을 갱신한다.
 
 ## 4. 태그 주석과 GitHub Release 노트의 동일성
 
@@ -65,11 +66,11 @@ Jamong-Harvest의 versioning 규칙을 따른다. SemVer의 호환성 의미와 
 ## 5. 현재 배포 준비 완료 조건
 
 - [ ] 웹 P1~P6 구현과 자동 테스트·정적 검사·컨테이너 smoke 근거 확보. 미검증 항목을 명시.
-- [ ] `Dockerfile`·`compose.yaml`·`.dockerignore`·`.env.example` 작성, 이미지 build/up/health 확인.
+- [x] `Dockerfile`·`compose.yaml`·`.dockerignore`·`.env.example` 작성, 이미지 build/up/health 확인(2026-10-12 로컬).
 - [ ] MIT 및 이미지에 포함되는 의존성의 라이선스 고지 포함.
-- [ ] `changelog.md`, `pyproject.toml` 버전, 태그, 이미지 태그 일치 검사.
-- [ ] 사용자 명시 요청 후 릴리즈 커밋(`chore: <version> 릴리즈`), annotated tag와 push 수행.
-- [ ] `build.yml` 실행으로 이미지 푸시 후 Docker Hub의 `latest`·버전 태그 digest가 같은지 확인.
+- [x] `changelog.md`, `pyproject.toml` 버전, 태그, 이미지 태그 일치 검사(`build.yml`이 자동 확인).
+- [ ] 사용자 명시 요청 후 릴리즈 커밋(`chore: <version> 릴리즈`), annotated tag와 push 수행. 태그 push가 이미지 배포를 시작한다.
+- [ ] 태그 push로 실행된 `build.yml` 성공 후 Docker Hub의 `latest`·버전 태그 digest가 같은지 확인.
 - [ ] 동일한 노트로 GitHub Release 게시.
 
 실서버 배포(DNS, nginx, 서버의 compose 갱신)는 별도 명시 요청 범위다.
