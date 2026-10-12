@@ -1,11 +1,11 @@
 # EverythingMarkdown To-do
 
-- 최종 정리일: 2026-09-09
-- 현재 상태: P0 로컬 검증·P1 공통 코어·P2 CLI·**P3 GUI 완료**, 진행 중은 **P4 패키징·배포 준비**. 실환경 테스트는 배포 후 별도 단계로 이관했다.
-- 관련 문서: [진행 현황](PROGRESS.md) · [구현 설계서](docs/design.md) · [GUI 설계](DESIGN.md) · [검증 명세](docs/test-spec.md) · [A01~A26 현황](docs/acceptance-matrix.md)
-- 순서: P3 GUI(완료) → **P4 설정·문서·빌드 초안(진행 중)** → OS/CI 배포물 빌드·서명 → 배포 후 실환경 테스트.
-- 기준 커밋: `ae9dac6` 이후 P3/P4 작업분(미커밋).
-- 검증 근거: `uv run --group dev pytest` 전체 126개 통과(unittest subTest 포함), `ruff check`·`mypy` 통과 (2026-09-09 실행).
+- 최종 정리일: 2026-10-12
+- 현재 상태: 로컬 앱 P0~P3 완료, **P4 패키징·배포 준비 진행 중**(초안 완료, `build.yml` 미실행). **개인용 웹 서비스 전환(웹 P1~P6)은 계획만 완료, 구현 미착수.** 실환경 테스트는 배포 후 별도 단계로 이관했다.
+- 관련 문서: [진행 현황](PROGRESS.md) · [웹 서비스 전환 계획](docs/web-service-plan.md) · [구현 설계서](docs/design.md) · [GUI 설계](DESIGN.md) · [검증 명세](docs/test-spec.md) · [A01~A26 현황](docs/acceptance-matrix.md)
+- 순서: P3 GUI(완료) → **P4 설정·문서·빌드 초안(진행 중)** → OS/CI 배포물 빌드·서명 → 배포 후 실환경 테스트. 웹 서비스는 웹 P1 → P6 순서로 별도 진행한다.
+- 기준 커밋: `8edfd65` (P3/P4 초안·웹 계획·Docker 푸시 job 모두 커밋·푸시 완료).
+- 검증 근거: `uv run --locked --group dev pytest -q` 126개 통과, `ruff check .`·`mypy` 통과 (2026-10-12 재실행). GitHub `ci` 워크플로 최근 3회 성공, `build` 워크플로 실행 이력 없음.
 - 배포 요청 전에는 버전 항목·태그·Release를 만들지 않는다. 첫 배포 시 `26.1.0`으로 기록한다.
 - 2026-09-09 결정: Windows도 설치기 없이 **ZIP 배포**로 통일. lint=`ruff`, typecheck=`mypy` 채택.
 
@@ -19,6 +19,8 @@
 | P2 CLI | 완료 | GUI 구현 후 공통 동작 회귀 검증 |
 | P3 GUI | **완료** | `gui.py`·헤드리스 테스트·`everythingmarkdown-gui` 진입점·아이콘 연결 완료 |
 | P4 통합·패키징 | **진행 중** — 설정·문서·spec·CI 초안 완료 | OS/CI에서 실제 Windows `.exe`·macOS `.app` 빌드, 서명·공증, 라이선스 원문 포함 |
+| 웹 P1~P6 개인용 웹 서비스 | **계획 완료, 구현 미착수** | 웹 P1 웹 계약 확정 및 기존 동작 고정부터 착수 |
+| Docker Hub 배포 | 워크플로 job만 추가 | 웹 P5에서 `Dockerfile` 작성 전까지 `build.yml`의 `docker` job은 실패 |
 | 릴리즈 게시 | 사용자 배포 요청 대기 | 첫 릴리즈 노트·버전·태그·배포 파일 게시 |
 | 실환경 테스트 | 배포 후 이관 | 현재 개발 선행 조건에서 제외 |
 
@@ -150,9 +152,50 @@ Windows `.exe`·macOS `.app` 실제 빌드와 서명은 각 OS 또는 CI에서 �
 - [ ] 각 패키지 LICENSE/NOTICE 원문을 배포물에 포함.
 - [ ] (배포 요청 시) 버전/메타데이터/파일명 일치, changelog 추출·태그 동일성 검증.
 - [ ] 암호화 PDF fixture — pypdf/pikepdf 도입 여부 결정 후 A12 보강.
+- [ ] `packaging/emarkdown.spec`에 LICENSE/NOTICE 포함 설정 추가(현재 spec에 라이선스 파일 항목 없음).
+
+### Docker Hub 이미지 배포 (2026-10-12)
+
+- [x] `DOCKERHUB_USERNAME`·`DOCKERHUB_TOKEN` Actions 시크릿 등록 확인(`gh secret list`).
+- [x] `build.yml`에 `docker` job 추가: 로그인 후 `<USERNAME>/everythingmarkdown`을 `latest`·`pyproject` 버전 태그로 푸시(`8edfd65`).
+- [ ] 웹 P5의 `Dockerfile` 작성 후 첫 실행으로 로그인·빌드·푸시 확인. 현재 `version = "0.0.0"`이므로 버전 확정 전 실행 금지.
+- [ ] 배포 서버의 digest 기반 자동 업데이트 구성(Watchtower 미사용).
 
 **현재 완료 기준:** GUI 포함 로컬 검증·정적 검사·빌드 스크립트/CI 초안·미검증 범위 문서화까지 충족.
 실제 OS 배포물 빌드·서명은 남았고, 빌드 성공을 실행 보장으로 표현하지 않는다.
+
+## 개인용 웹 서비스 전환 — 계획 완료, 구현 미착수
+
+상세 계약·수용 기준(웹 A01~A25): [웹 서비스 전환 계획](docs/web-service-plan.md). 아래 단계명은 로컬 앱 P0~P4와 구분해 `웹 P*`로 표기한다.
+2026-10-12 확인: `src/everythingmarkdown/web/`, 웹 의존성, `tests/web/`, `Dockerfile`·`compose.yaml` 모두 없음.
+
+### 웹 P1 — 웹 계약 확정 및 기존 동작 고정
+- [ ] `DESIGN.md`·`docs/design.md`·`README.md`에 로컬 계약과 웹 계약(인증·보관·한도) 구분 기록.
+- [ ] 서로 다른 launch_dir에서 동명 파일 변환이 독립적이라는 회귀 테스트 추가.
+
+### 웹 P2 — 웹 기반과 단일 계정 인증
+- [ ] 웹 선택 의존성(FastAPI·Uvicorn·Jinja2·python-multipart·bcrypt·itsdangerous) 검토 후 `pyproject.toml`·`uv.lock`에 추가, 서버 진입점 정의. CLI 설치에 강제하지 않는다.
+- [ ] `web/{app,config,auth,store}.py`: `.env` 최초 비밀번호 bootstrap/reset, 비밀번호 전용 로그인, SQLite 스키마, 세션·CSRF·로그인 속도 제한, 기본 키 시작 거부.
+- [ ] 로그 기반(access/audit JSON Lines) 착수, `tests/web/test_auth.py`.
+
+### 웹 P3 — 업로드·변환·저장 수명주기
+- [ ] `web/{routes,jobs,worker,cleanup,audit}.py`: 작업별 경로·소유권 검사, 제한된 대기열, 자식 프로세스 변환·timeout 종료, 재시작 시 interrupted 처리.
+- [ ] 원본/Markdown 독립 보관 Y/N·일수, 시작/5분 주기 정리, 삭제 실패 재시도, 로그 회전.
+- [ ] `tests/web/test_{jobs,upload_limits,retention,logging}.py`.
+
+### 웹 P4 — 개인용 웹 화면
+- [ ] `web/templates/{base,index,login}.html`, `web/static/`: 업로드·상태 폴링·원문 확인/복사/다운로드/삭제, 만료·실패·인증 만료 안내.
+- [ ] `tests/web/test_views.py`와 데스크톱/모바일 폭 브라우저 검증.
+
+### 웹 P5 — Docker 및 도메인 배포 구성
+- [ ] `Dockerfile`(Python 3.12, 잠긴 의존성, 비루트, healthcheck), `compose.yaml`(`./data:/data`, `./logs:/logs`), `.dockerignore`, `.env.example`.
+- [ ] `docs/web-deployment.md`: 프록시 연결·HTTPS·secret 주입.
+- [ ] 이미지 build/up/health, 재시작 후 데이터 유지 검증.
+
+### 웹 P6 — 통합 검증과 운영 문서
+- [ ] 웹 A01~A25 수용 기준 검증 및 lint/typecheck/회귀/컨테이너 smoke 기록.
+- [ ] DB 백업/복원, 이미지 rollback 절차 문서화.
+- [ ] 실제 도메인·프록시 종류/위치·호스트 자원 확인(현재 미확인).
 
 ## 최초 릴리즈 게시 — 사용자 배포 요청 후에만
 

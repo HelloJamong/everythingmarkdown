@@ -1,8 +1,8 @@
 # EverythingMarkdown 진행 현황
 
-- 최종 정리일: 2026-09-09
-- 현재 단계: **P0~P3 완료 / P4 진행 중(설정·문서·빌드 초안 완료, OS/CI 배포물 빌드 남음) / 목표 OS 실환경 테스트는 배포 후 이관**
-- 다음 작업: Windows/macOS 러너에서 배포물 빌드·서명, (배포 요청 시) 릴리즈 게시
+- 최종 정리일: 2026-10-12
+- 현재 단계: **P0~P3 완료 / P4 진행 중(설정·문서·빌드 초안 완료, OS/CI 배포물 빌드 남음) / 웹 서비스 전환은 계획 완료·구현 미착수 / 목표 OS 실환경 테스트는 배포 후 이관**
+- 다음 작업: 웹 P1(웹 계약 확정·기존 동작 고정) 착수, Windows/macOS 러너에서 배포물 빌드·서명, (배포 요청 시) 릴리즈 게시
 
 ## 프로젝트 목표
 
@@ -74,6 +74,23 @@ P0 프로브는 변환 성공 여부와 문자 수만 보고하며 **문서 본�
 - **2026-09-09 결정:** Windows도 설치기 없이 ZIP 배포. `docs/releasing.md`·README 개정.
 - 남음(OS/CI 필요): 실제 `.exe`/`.app` 빌드, 서명·공증, 라이선스 원문 포함, 암호화 PDF fixture.
 
+## 웹 서비스 전환 계획 (2026-09-11)
+
+- [웹 서비스 전환 계획](docs/web-service-plan.md) 작성: 개인 도메인 HTTPS에서 단일 소유자가 로그인해 업로드·Markdown 다운로드하는 Docker 서비스.
+- FastAPI 단일 프로세스 + SQLite + 제한된 변환 자식 프로세스, 기존 `ConversionService` 재사용. 원본/Markdown 독립 보관 정책, `./logs` 마운트 access/audit 로그.
+- 구현 단계 웹 P1~P6과 수용 기준 웹 A01~A25 정의. **코드·의존성·Docker 파일은 아직 없다**(2026-10-12 확인).
+
+## Docker Hub 배포 준비 (2026-10-12)
+
+- `DOCKERHUB_USERNAME`·`DOCKERHUB_TOKEN` Actions 시크릿 등록 확인.
+- `build.yml`에 `docker` job 추가(`8edfd65`): `<USERNAME>/everythingmarkdown`을 `latest`·`pyproject` 버전 태그로 푸시.
+- `Dockerfile`은 웹 P5에서 작성하므로 그 전까지 job은 실패한다. `build` 워크플로는 아직 한 번도 실행하지 않았다.
+
+## 현재 검증 상태 (2026-10-12)
+
+- `uv run --locked --group dev pytest -q` 126개 통과, `ruff check .`·`mypy` 통과.
+- GitHub `ci` 워크플로 최근 3회 성공(`1ccded7`에서 tkinter 없는 러너 실패 수정).
+
 ## 아직 완료하지 않은 것
 
 - **배포 후로 이관:** Windows/macOS의 Python 미설치 환경에서 GUI/CLI 및 7개 포맷 검증. 현재 개발 선행 조건이 아님.
@@ -81,6 +98,8 @@ P0 프로브는 변환 성공 여부와 문자 수만 보고하며 **문서 본�
 - 목표 환경 전체에서 의존성·패키저 최종 호환성 확정.
 - Windows/macOS 러너에서 실제 배포물 빌드, 코드서명·공증, 제3자 라이선스 원문 포함, 외부 릴리스.
 - 암호화 PDF fixture(A12) — pypdf/pikepdf 도입 여부 결정 대기.
+- `packaging/emarkdown.spec`에 LICENSE/NOTICE 포함 설정 없음.
+- 웹 서비스 웹 P1~P6 전체 구현, `Dockerfile` 작성 후 Docker Hub 첫 푸시 검증.
 
 **P0 테스트 15개 통과는 A01~A26 전체 수용 기준 통과나 Windows/macOS 지원 완료가 아니다.**
 P0 검증 당시에는 Git 작업을 수행하지 않았다. 이후 사용자 요청으로 `main` 브랜치를 초기화하고
@@ -100,6 +119,7 @@ P0 검증 당시에는 Git 작업을 수행하지 않았다. 이후 사용자 �
 - [릴리즈 정책](docs/releasing.md): 최종 Windows/macOS 배포 요구와 버전·태그·노트 계약 (구현 전 정의)
 - [changelog](changelog.md): 배포 시 작성할 릴리즈 노트. 현재 버전 항목 없음; 첫 배포는 `26.1.0`
 - [README](README.md): 설치·CLI/GUI 사용·빌드 방법
+- [웹 서비스 전환 계획](docs/web-service-plan.md): 개인용 웹 서비스 구조·보관·로그·단계·수용 기준
 - [TODO](TODO.md): 단계별 실행 체크리스트
 - [설계 기준선](docs/design.md): 원 요구사항과 세부 동작 계약
 - [GUI 설계](DESIGN.md): P3 GUI 구현 스펙 · [시각 목업](docs/gui-mockup.html)
