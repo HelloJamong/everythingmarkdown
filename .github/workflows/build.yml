@@ -1,5 +1,6 @@
 # Release: pushing a version tag (e.g. 26.1.0, no "v") builds and pushes the Docker image.
-# Pushes `latest` and the version tag from one build. GitHub Release notes stay manual (docs/releasing.md).
+# Pushes `latest` and the version tag from one build, then publishes the GitHub Release with
+# the changelog section as notes and docker-compose.yml + env.example attached (docs/releasing.md).
 name: build
 
 on:
@@ -41,3 +42,37 @@ jobs:
             org.opencontainers.image.licenses=MIT
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  release:
+    needs: docker
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Release notes = this version's changelog section (same text as the tag annotation)
+        run: |
+          python3 - <<'PY'
+          import os, re
+          tag = re.escape(os.environ["TAG"])
+          text = open("changelog.md", encoding="utf-8").read()
+          section = re.search(rf"^## \[{tag}\] - .*?(?=^## \[|\Z)", text, re.S | re.M).group(0)
+          open("notes.md", "w", encoding="utf-8", newline="\n").write(section.rstrip("\n") + "\n")
+          PY
+      - name: Download files for first-time setup
+        # GitHub renames assets that start with a dot, so .env.example ships as env.example.
+        run: |
+          mkdir dist
+          cp docker-compose.yml dist/docker-compose.yml
+          cp .env.example dist/env.example
+      - name: Create or update the GitHub Release
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/docker-compose.yml dist/env.example --clobber
+          else
+            gh release create "$TAG" --verify-tag --title "$TAG" --notes-file notes.md \
+              dist/docker-compose.yml dist/env.example
+          fi

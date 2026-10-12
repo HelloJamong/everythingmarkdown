@@ -1,36 +1,100 @@
 # EverythingMarkdown
 
-Microsoft MarkItDown으로 업로드한 문서를 Markdown으로 변환하는 **개인용 웹 서비스**를 준비하고 있습니다.
-Docker 이미지 하나로 배포하며, 본인만 로그인해 파일을 올리고 Markdown을 확인·복사·다운로드합니다.
+문서를 올리면 Markdown으로 변환해 주는 **개인용 웹 서비스**입니다. Microsoft [MarkItDown](https://github.com/microsoft/markitdown)으로 변환하며,
+Docker 이미지 하나로 배포됩니다. `.env`에 정한 비밀번호로 로그인해 파일을 올리고 결과를 확인·복사·다운로드합니다.
 
-> 현재는 **변환 코어만 구현된 상태**입니다. 웹 서버·로그인·업로드 화면과 Docker 이미지는 아직 없습니다.
-> 단계별 계획은 [웹 서비스 전환 계획](docs/web-service-plan.md), 남은 작업은 [TODO](TODO.md)를 참고하세요.
+- 지원 형식: 텍스트 PDF, DOCX, PPTX, XLSX, HTML, CSV, TXT (한 번에 한 개, 최대 25 MiB)
+- 원본과 Markdown의 보관 여부·보관 일수를 각각 설정
+- 접근·인증·변환·정리 기록을 `logs/`에 JSON Lines로 남김
+- HTTPS는 앱이 아닌 nginx 등 리버스 프록시에서 처리하고, 앱은 HTTP만 제공
+- 이미지: Docker Hub [`igor0670/everythingmarkdown`](https://hub.docker.com/r/igor0670/everythingmarkdown) (`linux/amd64`), 변경 이력: [changelog.md](changelog.md)
 
-## 목표
+## 설치 (처음 구성)
 
-- 개인 도메인에서 `.env`에 설정한 비밀번호로 로그인해 문서 한 개씩 업로드·변환
-- 지원 포맷: 텍스트 PDF, DOCX, PPTX, XLSX, HTML, CSV, TXT
-- 결과 Markdown 원문 확인·복사·다운로드·삭제
-- 원본/Markdown 보관 여부와 보관 일수를 `.env`로 각각 설정
-- 서버가 관찰할 수 있는 접근·인증·변환·정리 이벤트를 `./logs`에 기록
-- HTTPS는 앱이 아닌 nginx 등 리버스 프록시에서 처리. 앱은 HTTP만 제공
+필요한 것: `linux/amd64` 서버, Docker Engine과 Compose 플러그인(`docker compose`).
+
+### 1. 구성 디렉터리 만들기
+
+```sh
+mkdir -p ~/everythingmarkdown/data ~/everythingmarkdown/logs
+cd ~/everythingmarkdown
+```
+
+`data/`에는 업로드·변환 결과와 작업 DB(`app.db`)가, `logs/`에는 감사·접근 로그가 쌓입니다.
+
+### 2. 설정 파일 내려받기
+
+[최신 GitHub Release](https://github.com/HelloJamong/everythingmarkdown/releases/latest)에 첨부된 두 파일을 받습니다.
+브라우저로 받아 옮겨도 되고, 서버에서 바로 받으려면:
+
+```sh
+curl -fsSLO https://github.com/HelloJamong/everythingmarkdown/releases/latest/download/docker-compose.yml
+curl -fsSL -o .env https://github.com/HelloJamong/everythingmarkdown/releases/latest/download/env.example
+chmod 600 .env
+```
+
+- GitHub는 점(`.`)으로 시작하는 첨부 파일 이름을 바꾸기 때문에 `.env.example`은 `env.example`로 올라가 있습니다. 받을 때 `.env`로 저장합니다.
+- 특정 버전을 쓰려면 `latest/download` 대신 `download/26.1.1`처럼 버전을 넣습니다.
+
+구성이 끝나면 디렉터리는 다음과 같습니다.
+
+```text
+~/everythingmarkdown/
+├── docker-compose.yml
+├── .env            # 비밀번호 등 설정 (권한 600, 외부 공유 금지)
+├── data/
+└── logs/
+```
+
+### 3. `.env` 수정
+
+```sh
+# 컨테이너가 data/·logs/에 쓸 수 있도록 현재 사용자 ID 지정
+sed -i "s/^EMD_UID=.*/EMD_UID=$(id -u)/; s/^EMD_GID=.*/EMD_GID=$(id -g)/" .env
+```
+
+그다음 편집기로 `.env`를 열어 최소한 아래를 정합니다.
+
+| 항목 | 설명 |
+|---|---|
+| `APP_PASSWORD` | 로그인 비밀번호. **12자 이상**, 예제 값 그대로면 시작하지 않음 |
+| `EMD_BIND`, `EMD_PORT` | 앱 포트. 기본 `127.0.0.1:8000`(nginx가 같은 서버에서 연결) |
+| `COOKIE_SECURE` | HTTPS 뒤에서는 `true`(기본). nginx 없이 http로 시험할 때만 `false` |
+| `UPLOAD_KEEP`, `MARKDOWN_KEEP` | 원본·결과 보관 `Y`/`N`. `Y`면 `*_RETENTION_DAYS` 일수 필수 |
+| `FORWARDED_ALLOW_IPS` | nginx 주소(실제 접속 IP를 믿을 프록시) |
+
+나머지 항목은 `.env` 안의 설명을 참고하세요.
+
+### 4. 실행과 접속
+
+```sh
+docker compose up -d
+docker compose ps          # STATUS가 healthy가 되면 준비 완료
+```
+
+- **운영:** nginx에서 HTTPS를 받아 `127.0.0.1:8000`으로 넘깁니다. 설정 예시와 주의점(`Host` 헤더 전달 필수)은 [배포 문서](docs/web-deployment.md).
+- **LAN 시험(nginx 없음):** `.env`에 `EMD_BIND=0.0.0.0`, `COOKIE_SECURE=false`를 넣고 `docker compose up -d` 후 `http://<서버 IP>:8000`으로 접속합니다. 방화벽에서 포트를 열어야 할 수 있으며, 시험이 끝나면 되돌립니다.
+
+### 운영 명령
+
+```sh
+docker compose pull && docker compose up -d   # 새 이미지로 갱신
+docker compose logs -f                          # 컨테이너 출력
+docker compose down                             # 중지 (data/·logs/는 남음)
+```
+
+비밀번호를 바꾸면 `.env` 수정 후 `docker compose up -d`로 다시 시작합니다(모든 로그인이 풀림).
+자동 갱신(digest 감지, Watchtower 미사용), 되돌리기, 백업은 [배포 문서](docs/web-deployment.md)에 있습니다.
 
 ## 구성
 
 ```text
-브라우저 → HTTPS → nginx 등 리버스 프록시 → 웹 앱 컨테이너 (HTTP)
+브라우저 → HTTPS → nginx 등 리버스 프록시 → 웹 앱 컨테이너 (HTTP :8000)
                                              ├─ 비밀번호 로그인·서명 쿠키
-                                             ├─ 업로드·작업 상태·다운로드
-                                             ├─ SQLite (/data)
-                                             └─ 변환 자식 프로세스 → 변환 코어
+                                             ├─ 업로드·작업 상태·미리보기·다운로드
+                                             ├─ SQLite (/data/app.db)
+                                             └─ 변환 자식 프로세스 → 변환 코어(MarkItDown)
 ```
-
-| 경로 | 내용 | 상태 |
-|---|---|---|
-| `src/everythingmarkdown/{models,service,markitdown_adapter}.py` | 변환 코어: 입력 검증, MarkItDown 호출, UTF-8/LF 저장 | 구현 완료 |
-| `src/everythingmarkdown/web/` | 웹 앱 (FastAPI) | 인증·작업 API·변환·보관·로그·화면 완료 |
-| `Dockerfile`, `compose.yaml` | 통합 웹 서비스 이미지·실행 구성 ([배포 문서](docs/web-deployment.md)) | 완료 |
-| `.github/workflows/build.yml` | 버전 태그 푸시 시 Docker Hub 이미지 빌드·푸시 | 완료(첫 실행 전) |
 
 ## 개발 환경
 
@@ -38,47 +102,77 @@ Python 3.12와 [uv](https://docs.astral.sh/uv/)를 사용합니다.
 
 ```sh
 uv sync --locked --group dev
-uv run --locked --group dev pytest -q      # 전체 테스트
-uv run --locked --group dev ruff check .    # lint
-uv run --locked --group dev mypy            # 타입체크 (src)
+uv run --locked pytest -q        # 전체 테스트
+uv run --locked ruff check .      # lint
+uv run --locked mypy              # 타입체크 (src)
+```
 
-# 로컬 실행 (프록시 없이 http로 접속할 때만 COOKIE_SECURE=false)
+### 로컬에서 실행
+
+```sh
+# 프록시 없이 http로 접속하므로 COOKIE_SECURE=false
 APP_PASSWORD='12자 이상 비밀번호' COOKIE_SECURE=false DATA_DIR=./data LOG_DIR=./logs \
   uv run --locked uvicorn --factory everythingmarkdown.web.app:create_app --port 8000
 ```
 
-## 변환 코어 사용 예
+`http://localhost:8000`으로 접속합니다. `./data`·`./logs`는 Git에서 제외됩니다.
 
-웹 앱은 이 공통 서비스를 호출합니다.
+### 로컬 이미지로 실행
+
+```sh
+docker build -t everythingmarkdown:local .
+# .env에 EMD_IMAGE=everythingmarkdown:local 을 넣고
+docker compose up -d
+```
+
+### 저장소 구조
+
+| 경로 | 내용 |
+|---|---|
+| `src/everythingmarkdown/{models,service,markitdown_adapter}.py` | 변환 코어: 입력 검증, MarkItDown 호출, UTF-8/LF 저장 |
+| `src/everythingmarkdown/web/` | 웹 앱(FastAPI): `config`·`auth`·`jobs`·`worker`·`routes`·`logs`, `templates/`, `static/` |
+| `tests/unit`, `tests/integration` | 변환 코어 테스트 |
+| `tests/web` | 인증·작업·보관·로그·화면·수용 기준 테스트 |
+| `Dockerfile`, `.dockerignore` | 이미지(비루트, healthcheck, TLS 미포함) |
+| `docker-compose.yml`, `.env.example` | 실행 구성(Release에도 첨부) |
+| `.github/workflows/ci.yml` | `main` 푸시·PR마다 ruff·mypy·pytest |
+| `.github/workflows/build.yml` | 버전 태그 푸시 시 검사 → 이미지 푸시 → GitHub Release 게시 |
+| `licenses/` | wheel에 원문이 없는 의존성 라이선스 보충본 |
+| `docs/` | [설계·계획](docs/web-service-plan.md), [배포](docs/web-deployment.md), [검증 기록](docs/web-validation.md), [릴리즈 정책](docs/releasing.md) |
+
+### 변환 코어 사용 예
+
+웹 앱은 이 공통 서비스를 별도 프로세스에서 호출합니다.
 
 ```python
 from pathlib import Path
 from everythingmarkdown import ConversionRequest, ConversionService
 
 result = ConversionService().convert(
-    ConversionRequest(input_path=Path("report.docx"), launch_dir=Path("/data/work/job-id"))
+    ConversionRequest(input_path=Path("/data/uploads/<id>/input.docx"), launch_dir=Path("/data/.work/<id>"))
 )
-print(result.output_path)  # <launch_dir>/convert_result/report.md
+print(result.output_path)  # <launch_dir>/convert_result/input.md
 ```
 
 일반 로컬 파일만 허용하며 기존 결과는 덮어쓰지 않습니다. 오류는 `ConversionError.code`로 확인하고,
-메시지에 문서 내용이나 파서 원문 예외를 넣지 않습니다. 상세 검증: [P1 검증 기록](docs/p1-validation.md).
+메시지에 문서 내용이나 파서 원문 예외를 넣지 않습니다.
+
+### 릴리즈
+
+1. `changelog.md`에 `## [YY.메이저.마이너] - 날짜` 항목을 쓰고 `pyproject.toml` 버전을 맞춘 뒤 `uv lock`.
+2. 릴리즈 커밋 후 같은 노트로 annotated tag를 만들어 푸시합니다(`v` 접두사 없음).
+3. `build.yml`이 검사 → 태그·버전·changelog 일치 확인 → Docker Hub `latest`·버전 이미지 푸시 → GitHub Release(노트 + `docker-compose.yml`·`env.example`)를 처리합니다.
+
+상세: [릴리즈 정책](docs/releasing.md).
 
 ## 범위와 한계
 
-- 100 MiB 제한은 초기 제안값이며 악성 문서 격리나 자원 사용량 보장이 아닙니다.
-- OCR, 이미지·오디오, URL 변환, 일괄 변환, 회원가입·다중 사용자, 공개 API는 범위 밖입니다.
-- Markdown은 텍스트/구조 추출 결과이며 원본 레이아웃의 완전 재현을 보장하지 않습니다.
-
-## 릴리즈 정책
-
-- 배포물은 Docker Hub 이미지 `<DOCKERHUB_USERNAME>/everythingmarkdown`입니다. `latest`와 버전 태그를 함께 푸시합니다.
-- [changelog.md](changelog.md)를 릴리즈 노트의 단일 원본으로 사용하고, 같은 노트를 annotated tag와 GitHub Release에 씁니다.
-- 첫 배포는 `26.1.0`, 이후 `YY.메이저.마이너`. 배포 요청 전에는 버전·태그·Release를 만들지 않습니다.
-- 상세: [릴리즈 정책](docs/releasing.md).
+- 스캔 이미지 PDF의 OCR, 이미지·오디오, URL 변환, 일괄 변환, 회원가입·다중 사용자, 공개 API는 지원하지 않습니다.
+- Markdown은 텍스트·구조 추출 결과이며 원본 레이아웃을 완전히 재현하지 않습니다.
+- 크기·압축·시간·자원 한도로 위험을 줄이지만 악성 문서에 대한 완전한 격리를 보장하지는 않습니다.
+- 남은 검증 항목은 [검증 기록](docs/web-validation.md)에 있습니다.
 
 ## 라이선스
 
-이 프로젝트의 자체 코드는 [MIT License](LICENSE)를 따릅니다.
-MarkItDown 및 전이 의존성 라이선스 목록은 [docs/third-party-licenses.md](docs/third-party-licenses.md)에 정리했고, 원문은 이미지의 `/usr/share/doc/everythingmarkdown/`과 각 패키지 `dist-info`에 들어 있습니다.
-`.omx/`와 `.omc/`는 로컬 작업 기록으로 Git 추적 대상에서 제외합니다.
+이 프로젝트의 코드는 [MIT License](LICENSE)를 따릅니다.
+의존성 라이선스 목록은 [docs/third-party-licenses.md](docs/third-party-licenses.md)에 있고, 원문은 이미지의 `/usr/share/doc/everythingmarkdown/`과 각 패키지 `dist-info`에 들어 있습니다.

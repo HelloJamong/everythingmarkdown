@@ -19,15 +19,17 @@ git push origin 26.1.0
 ```
 
 - 태그 형식은 `YY.메이저.마이너`이며 `v` 접두사를 붙이지 않는다. 형식이 다른 태그는 워크플로를 시작하지 않는다.
-- GitHub Release 게시는 자동화하지 않았다. 같은 노트로 `gh release create`를 따로 실행한다.
+- 이미지 푸시 후 같은 워크플로가 GitHub Release를 만든다. 본문은 `changelog.md`의 해당 버전 섹션이고, 첫 설치용 `docker-compose.yml`과 `env.example`(= `.env.example`)을 첨부한다. Release가 이미 있으면 첨부 파일만 갱신한다.
 
 ## 2. 서버 준비
 
 ```sh
 mkdir -p ~/everythingmarkdown/{data,logs} && cd ~/everythingmarkdown
-# 저장소의 compose.yaml과 .env.example을 복사한 뒤
-cp .env.example .env && chmod 600 .env
-# .env: EMD_IMAGE, APP_PASSWORD(12자 이상), EMD_UID/EMD_GID(= id -u / id -g) 수정
+curl -fsSLO https://github.com/HelloJamong/everythingmarkdown/releases/latest/download/docker-compose.yml
+curl -fsSL -o .env https://github.com/HelloJamong/everythingmarkdown/releases/latest/download/env.example
+chmod 600 .env
+sed -i "s/^EMD_UID=.*/EMD_UID=$(id -u)/; s/^EMD_GID=.*/EMD_GID=$(id -g)/" .env
+# .env: APP_PASSWORD(12자 이상) 등 수정
 docker compose pull && docker compose up -d
 docker compose ps        # STATUS가 healthy인지 확인
 ```

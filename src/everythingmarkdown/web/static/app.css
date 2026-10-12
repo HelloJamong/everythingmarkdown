@@ -118,11 +118,13 @@ h2 { font-size: 20px; line-height: 1.3; margin: 0 0 12px; font-weight: 600; }
   background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px;
   min-height: 520px; display: flex; flex-direction: column; min-width: 0;
 }
+/* Title column shrinks and wraps; the tools column keeps its place whatever the title length. */
 .sheet-head {
-  display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start;
   gap: 12px 24px; padding: 20px 24px; border-bottom: 1px solid var(--rule);
 }
-.sheet-head h2 { margin: 0; font-family: var(--mono); font-weight: 500; font-size: 20px; word-break: break-all; }
+.sheet-head h2 { margin: 0; font-family: var(--mono); font-weight: 500; font-size: 20px; overflow-wrap: anywhere; }
+.sheet-head .tools { flex-wrap: nowrap; }
 .meta { margin: 4px 0 0; font-size: 14px; color: var(--graphite); display: flex; flex-wrap: wrap; gap: 4px 16px; }
 .tools { display: flex; gap: 8px; flex-wrap: wrap; }
 .sheet-note {
@@ -133,11 +135,16 @@ h2 { font-size: 20px; line-height: 1.3; margin: 0 0 12px; font-weight: 600; }
   margin: 0; padding: 16px 0; overflow: auto; flex: 1;
   font: 400 14px/1.7 var(--mono); counter-reset: ln; tab-size: 4;
 }
-.code .l { display: block; padding: 0 24px 0 0; white-space: pre-wrap; word-break: break-word; counter-increment: ln; }
+/* Two columns per line: wrapped text stays in the text column instead of flowing under the number. */
+.code .l {
+  display: grid; grid-template-columns: 56px minmax(0, 1fr); column-gap: 8px;
+  padding: 0 24px 0 0; counter-increment: ln;
+}
 .code .l::before {
-  content: counter(ln); display: inline-block; width: 56px; padding-right: 16px; margin-right: 8px;
+  content: counter(ln); padding-right: 16px;
   text-align: right; color: #A3A9B5; border-right: 1px solid var(--rule); user-select: none;
 }
+.code .l > .txt { white-space: pre-wrap; overflow-wrap: anywhere; justify-self: start; }
 .code .h { font-weight: 500; }
 .code .h > .txt {
   background-image: linear-gradient(var(--mark-soft), var(--mark-soft));
@@ -192,8 +199,9 @@ dialog .tools { justify-content: flex-end; }
   .recent { order: 2; }
   .topbar { padding: 10px 16px; }
   .sheet { min-height: 360px; }
-  .sheet-head { padding: 16px; }
-  .code .l::before { width: 40px; padding-right: 10px; }
+  .sheet-head { padding: 16px; grid-template-columns: minmax(0, 1fr); }  /* tools always under the title */
+  .code .l { grid-template-columns: 40px minmax(0, 1fr); }
+  .code .l::before { padding-right: 10px; }
   .state { padding: 32px 16px; }
   .state h3 { font-size: 24px; }
   .recent { margin-top: 24px; }

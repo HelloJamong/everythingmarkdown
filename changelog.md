@@ -3,6 +3,27 @@
 EverythingMarkdown 버전별 변경 이력과 릴리즈 노트입니다. 최신 버전이 위에 옵니다.
 각 버전 섹션은 태그 주석과 GitHub Release 본문에 그대로 사용합니다. 상세 규칙: [릴리즈 정책](docs/releasing.md).
 
+## [26.1.1] - 2026-10-12
+
+결과 화면 사용성 수정과 첫 설치용 파일 배포.
+
+### Fixed
+- 미리보기에서 긴 줄이 줄바꿈되면 줄번호 칸 밖으로 밀려 나오던 문제. 넘어간 줄도 내용 칸 안에 맞춰 표시합니다.
+- `http://`로 접속하면 복사 버튼이 항상 "복사하지 못했습니다"가 되던 문제. 클립보드 API가 없는 http 환경에서도 복사합니다.
+- 파일 이름 길이에 따라 복사·다운로드·삭제 버튼 위치가 바뀌던 문제. 넓은 화면에서는 항상 오른쪽 위, 좁은 화면에서는 항상 제목 아래에 둡니다.
+- 원본 보관 안 함(N) 설정에서 변환 완료 직후 상태 조회에 원본이 잠깐 남아 있는 것으로 보이던 처리 순서.
+
+### Added
+- GitHub Release에 첫 설치용 `docker-compose.yml`과 `env.example`(`.env.example`)을 첨부합니다. 태그 푸시 시 워크플로가 Release를 만들고 파일을 올립니다.
+- `docker-compose.yml`의 기본 이미지를 Docker Hub `igor0670/everythingmarkdown:latest`로 지정해, 내려받은 파일만으로 실행할 수 있습니다.
+
+### Changed
+- 저장소의 `compose.yaml`을 `docker-compose.yml`로 이름을 바꿨습니다.
+- README를 첫 설치(파일 내려받기→디렉터리 구성→실행)와 개발 환경 중심으로 정리했습니다.
+
+### 이미지
+- Docker Hub `igor0670/everythingmarkdown:26.1.1`, `latest` (같은 빌드), `linux/amd64`
+
 ## [26.1.0] - 2026-10-12
 
 첫 릴리즈. 문서를 올리면 Markdown으로 변환해 주는 개인용 웹 서비스를 Docker 이미지 하나로 배포합니다.

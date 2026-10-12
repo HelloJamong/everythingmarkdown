@@ -232,12 +232,28 @@ for (const e of ["dragleave", "drop"]) drop.addEventListener(e, (ev) => { ev.pre
 drop.addEventListener("drop", (ev) => { if (ev.dataTransfer.files[0]) upload(ev.dataTransfer.files[0]); });
 
 // ---------- 결과 도구 ----------
+// The Clipboard API exists only on HTTPS/localhost; plain-http LAN access falls back to execCommand.
+async function copyText(text) {
+  if (window.isSecureContext && navigator.clipboard) {
+    try { await navigator.clipboard.writeText(text); return true; } catch { /* fall through */ }
+  }
+  const area = document.createElement("textarea");
+  area.value = text;
+  area.setAttribute("readonly", "");
+  area.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;opacity:0";
+  document.body.append(area);
+  area.select();
+  let ok = false;
+  try { ok = document.execCommand("copy"); } catch { ok = false; }
+  area.remove();
+  return ok;
+}
+
 $("#copy").addEventListener("click", async () => {
   const partial = !$("#trunc").hidden;
-  try {
-    await navigator.clipboard.writeText(previewText);
+  if (await copyText(previewText)) {
     toast(partial ? "미리보기 부분(64 KiB)만 복사했습니다" : "Markdown을 복사했습니다");
-  } catch {
+  } else {
     const range = document.createRange();
     range.selectNodeContents($("#code"));
     getSelection().removeAllRanges();

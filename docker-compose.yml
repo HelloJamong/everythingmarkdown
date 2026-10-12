@@ -1,7 +1,7 @@
-# Runtime settings come from .env (copy .env.example). See docs/web-deployment.md.
+# Runtime settings come from .env (copy .env.example; the release asset is env.example). See README.
 services:
   everythingmarkdown:
-    image: ${EMD_IMAGE:-everythingmarkdown:local}
+    image: ${EMD_IMAGE:-igor0670/everythingmarkdown:latest}
     env_file: .env
     # Run as the owner of ./data and ./logs so bind mounts are writable without sudo.
     user: "${EMD_UID:-10001}:${EMD_GID:-10001}"

@@ -9,7 +9,7 @@
 
 - 제품은 개인용 웹 서비스이며 **배포물은 통합 웹 서비스 Docker 이미지 하나**다. Windows/macOS 앱·CLI 배포물은 만들지 않는다.
 - 모든 버전의 변경 이력과 릴리즈 노트는 `changelog.md`에 기록한다.
-- 릴리즈 태그의 주석과 GitHub Release 본문은 해당 버전의 노트를 그대로 사용한다. GitHub Release에는 바이너리를 첨부하지 않는다.
+- 릴리즈 태그의 주석과 GitHub Release 본문은 해당 버전의 노트를 그대로 사용한다. GitHub Release에는 바이너리 대신 첫 설치용 `docker-compose.yml`과 `env.example`(`.env.example`, GitHub가 앞의 점을 허용하지 않음)만 첨부한다(2026-10-12 결정).
 - HTTPS는 이미지에 포함하지 않는다. nginx 등 리버스 프록시에서 종료한다([웹 서비스 전환 계획](web-service-plan.md)).
 
 ## 2. Docker 이미지 배포
@@ -58,8 +58,9 @@ Jamong-Harvest의 versioning 규칙을 따른다. SemVer의 호환성 의미와 
 5. 릴리즈 제목은 버전으로 통일한다. Docker 이미지도 동일 태그의 커밋에서 빌드한다.
 6. 공개된 태그·기존 노트를 강제로 덮어쓰지 않는다. 수정이 필요하면 새 버전과 별도 승인으로 처리한다.
 
-`git tag -a <version> -F <노트 파일>` 및 `gh release create <version> --verify-tag --notes-file <노트 파일>`
-방식을 사용한다. **이 문서는 해당 명령 실행 요청이 아니다.** 향후 자동화 시 추출·일치 검사를 구현한다.
+태그는 `git tag -a <version> -F <노트 파일>`로 만든다. GitHub Release는 태그 푸시 후 `build.yml`의 `release` job이
+같은 changelog 섹션으로 `gh release create --verify-tag`를 실행하고 두 설정 파일을 첨부한다.
+**이 문서는 해당 명령 실행 요청이 아니다.**
 
 ## 5. 현재 배포 준비 완료 조건
 
@@ -69,7 +70,7 @@ Jamong-Harvest의 versioning 규칙을 따른다. SemVer의 호환성 의미와 
 - [x] `changelog.md`, `pyproject.toml` 버전, 태그, 이미지 태그 일치 검사(`build.yml`이 자동 확인).
 - [ ] 사용자 명시 요청 후 릴리즈 커밋(`chore: <version> 릴리즈`), annotated tag와 push 수행. 태그 push가 이미지 배포를 시작한다.
 - [ ] 태그 push로 실행된 `build.yml` 성공 후 Docker Hub의 `latest`·버전 태그 digest가 같은지 확인.
-- [ ] 동일한 노트로 GitHub Release 게시.
+- [x] 동일한 노트로 GitHub Release 게시(26.1.0 수동, 26.1.1부터 `build.yml`이 게시·첨부).
 
 실서버 배포(DNS, nginx, 서버의 compose 갱신)는 별도 명시 요청 범위다.
-GitHub 저장소는 비공개, Docker Hub 저장소는 공개다. 공개 범위 변경은 이 문서로 하지 않는다.
+GitHub 저장소와 Docker Hub 저장소는 모두 공개다(2026-10-12 확인). 공개 범위 변경은 이 문서로 하지 않는다.
