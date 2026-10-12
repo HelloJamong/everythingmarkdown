@@ -1,8 +1,8 @@
 # EverythingMarkdown 진행 현황
 
 - 최종 정리일: 2026-10-12
-- 현재 단계: **변환 코어·웹 P1~P6 완료 / 첫 릴리즈 대기**
-- 다음 작업: 사용자 요청 시 첫 릴리즈 `26.1.0`(버전·changelog·태그 푸시), 실서버·nginx 구성
+- 현재 단계: **26.1.0 릴리즈 완료(2026-10-12)**
+- 다음 작업: 테스트 서버 사용자 확인, 실서버·nginx 구성, 부분 충족 수용 기준 보완
 
 ## 프로젝트 목표
 
@@ -18,7 +18,7 @@ HTTPS는 nginx 등 리버스 프록시에서 처리한다. 설계 기준: [웹 �
 | 웹 앱 `src/everythingmarkdown/web/` | 인증, 작업 API(업로드·상태·미리보기·다운로드·삭제), 자식 프로세스 변환, 보관·정리, JSON 로그 완료. 업로드·결과 화면 완료 |
 | Docker `Dockerfile`·`compose.yaml` | 완료. 로컬 build/up/health·재시작 검증 |
 | CI `ci.yml` | ruff·mypy·pytest, `main` push마다 실행, `build.yml`에서도 재사용 |
-| 배포 `build.yml` | 버전 태그 푸시 시 검사 → 버전 일치 확인 → `latest`·버전 이미지 푸시. 아직 실행 전 |
+| 배포 `build.yml` | 버전 태그 푸시 시 검사 → 버전 일치 확인 → `latest`·버전 이미지 푸시. `26.1.0`에서 첫 실행 성공 |
 | Docker Hub | 공개 저장소, `linux/amd64` 단일 이미지. 시크릿 `DOCKERHUB_USERNAME`·`DOCKERHUB_TOKEN` 등록 확인 |
 
 ## 이력 요약
@@ -79,6 +79,12 @@ HTTPS는 nginx 등 리버스 프록시에서 처리한다. 설계 기준: [웹 �
 - 컨테이너로 변환 중 재시작(interrupted), 재생성 후 데이터·로그 유지, forwarded 헤더 위조 무시, 보안 설정 확인.
 - 라이선스 고지 확정, 누락 원문 4개 보충.
 
+## 26.1.0 릴리즈 (2026-10-12)
+
+- 릴리즈 커밋·annotated tag `26.1.0` 푸시 → `build.yml` 성공 → Docker Hub `igor0670/everythingmarkdown`의 `26.1.0`·`latest` digest 일치.
+- GitHub Release `26.1.0` 게시, 본문은 태그 주석·changelog 섹션과 동일.
+- 테스트 서버 `~/everythingmarkdown`에서 Docker Hub 이미지 실행(LAN http `:8000`, nginx 없음, `COOKIE_SECURE=false`): healthy, 로그인·xlsx 변환·삭제 확인.
+
 ## 남은 위험
 
 - 실제 도메인·nginx 위치·호스트 자원이 미확인이다. 웹 P5 전까지 정한다.
@@ -92,7 +98,7 @@ HTTPS는 nginx 등 리버스 프록시에서 처리한다. 설계 기준: [웹 �
 - [TODO](TODO.md): 단계별 체크리스트
 - [웹 서비스 설계·계획](docs/web-service-plan.md): 구조·인증·보관·로그·단계·수용 기준
 - [릴리즈 정책](docs/releasing.md): Docker 이미지 배포, 버전·태그·노트 규칙
-- [changelog](changelog.md): 배포 시 작성할 릴리즈 노트. 첫 배포는 `26.1.0`
+- [changelog](changelog.md): 릴리즈 노트. 최신 `26.1.0`
 - [P1 검증 기록](docs/p1-validation.md): 변환 코어 검증
 - [서드파티 라이선스](docs/third-party-licenses.md): 의존성 라이선스 초안
 

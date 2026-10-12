@@ -2,7 +2,7 @@
 
 - 최종 정리일: 2026-10-12
 - 제품: **개인용 웹 서비스**. 배포물은 Docker Hub의 통합 웹 서비스 이미지 하나다.
-- 현재 상태: 변환 코어·웹 P1~P6 완료. **다음은 사용자 요청 시 첫 릴리즈 `26.1.0`**. 배포는 버전 태그 푸시로 시작한다. 검증 기록: [docs/web-validation.md](docs/web-validation.md).
+- 현재 상태: **26.1.0 릴리즈 완료(2026-10-12)**. Docker Hub `igor0670/everythingmarkdown:26.1.0`·`latest`. 배포는 버전 태그 푸시로 시작한다. 검증 기록: [docs/web-validation.md](docs/web-validation.md).
 - 관련 문서: [진행 현황](PROGRESS.md) · [웹 서비스 설계·계획](docs/web-service-plan.md) · [릴리즈 정책](docs/releasing.md) · [P1 코어 검증](docs/p1-validation.md)
 - 2026-10-12 결정:
   - 데스크톱 GUI·CLI·P0 프로브·PyInstaller 패키징 폐기(Git 이력에 보존).
@@ -24,7 +24,7 @@
 | 웹 P4 화면 | 완료 | |
 | 웹 P5 Docker | 완료 | Docker Hub 첫 푸시는 첫 릴리즈 태그에서 |
 | 웹 P6 통합 검증·운영 문서 | 완료 | A01~A25 중 충족 17·부분 8 |
-| 릴리즈 | 사용자 배포 요청 대기 | |
+| 릴리즈 26.1.0 | 완료 | 실서버·nginx 구성은 별도 |
 
 ## 변환 코어 — 완료
 
@@ -78,7 +78,7 @@
 - [x] `build.yml` Docker job을 `linux/amd64`로 고정.
 - [x] 이미지에 `.env`·`app.db`·로그 없음, `/data`·`/logs` 비어 있음, 레이어 명령에 비밀 문자열 없음 확인.
 - [x] `build.yml`: `YY.메이저.마이너` 태그 푸시로 시작 → `ci.yml` 검사 → 태그·`pyproject.toml` 버전·`changelog.md` 항목 일치 확인 → `latest`·버전 태그 푸시. 수동 실행 제거.
-- [ ] `build.yml` 첫 실행(첫 릴리즈 태그)으로 Docker Hub 로그인·빌드·푸시 확인.
+- [x] `build.yml` 첫 실행(태그 `26.1.0`)으로 Docker Hub 로그인·빌드·푸시 확인.
 - [ ] 배포 서버에 digest 갱신 스크립트(cron) 설치(Watchtower 미사용). 스크립트 예시는 배포 문서에 있음.
 
 ## 웹 P6 — 통합 검증과 운영 문서 (완료)
@@ -92,8 +92,10 @@
 ## 최초 릴리즈 26.1.0 (2026-10-12 사용자 요청)
 
 - [x] `changelog.md`에 `26.1.0`과 배포 날짜·변경 내역·미검증 범위 작성, `pyproject.toml`·`uv.lock` 버전 `26.1.0`.
-- [ ] 릴리즈 커밋·annotated tag `26.1.0` push → `build.yml`이 `latest`·`26.1.0` 이미지 푸시, 두 태그 digest 일치 확인.
-- [ ] 동일 노트로 GitHub Release 게시.
+- [x] 릴리즈 커밋·annotated tag `26.1.0` push → `build.yml`(run 38212194202) 성공, `latest`·`26.1.0` digest `sha256:af3e4ae2…b9516` 일치, `linux/amd64`.
+- [x] 동일 노트로 GitHub Release `26.1.0` 게시(태그 주석·Release 본문·changelog 섹션 일치 확인, 첨부 없음).
+- [x] 테스트 서버(`~/everythingmarkdown`, LAN http `:8000`, nginx 없음)에서 Docker Hub 이미지로 healthy·로그인·변환·삭제 확인.
+- [x] 릴리즈 커밋 CI(run 38212190223) 실패 수정: 보관 N 원본을 지운 뒤 작업을 완료로 표시하도록 순서 변경. 버전은 26.1.0 유지(사용자 결정), 수정은 다음 릴리즈 이미지에 포함된다.
 
 ## 후속 검토 — MVP 필수 작업 아님
 

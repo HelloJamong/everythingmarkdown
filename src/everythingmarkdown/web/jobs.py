@@ -203,10 +203,11 @@ class Jobs:
         else:
             state, error = self._publish(job_id, work, done)
         shutil.rmtree(work, ignore_errors=True)
-        self._finish(job_id, state, error)
-        logs.audit(f"conversion_{state}", job_id=job_id, error=error)
+        # Apply keep-N before marking the job finished, so a finished job never reports a stale upload.
         if job["upload_expires_at"] is None:
             self.remove_upload(job_id)
+        self._finish(job_id, state, error)
+        logs.audit(f"conversion_{state}", job_id=job_id, error=error)
 
     def _publish(
         self, job_id: str, work: Path, done: subprocess.CompletedProcess[str]
