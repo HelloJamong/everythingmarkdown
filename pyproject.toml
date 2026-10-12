@@ -31,7 +31,7 @@ dev = [
 where = ["src"]
 
 [tool.setuptools.package-data]
-everythingmarkdown = ["web/templates/*.html"]
+everythingmarkdown = ["web/templates/*.html", "web/static/*"]
 
 [tool.ruff]
 target-version = "py312"

@@ -1,8 +1,8 @@
 # EverythingMarkdown 진행 현황
 
 - 최종 정리일: 2026-10-12
-- 현재 단계: **변환 코어·웹 P1~P3 완료 / 웹 P4~P6 미착수**(P4 화면 목업 작성)
-- 다음 작업: 웹 P4(화면) — 목업을 템플릿으로 구현
+- 현재 단계: **변환 코어·웹 P1~P4 완료 / 웹 P5~P6 미착수**
+- 다음 작업: 웹 P5(Docker 이미지·compose·배포 문서)
 
 ## 프로젝트 목표
 
@@ -15,7 +15,7 @@ HTTPS는 nginx 등 리버스 프록시에서 처리한다. 설계 기준: [웹 �
 | 영역 | 상태 |
 |---|---|
 | 변환 코어 `models`·`service`·`markitdown_adapter` | 완료. 7개 포맷, 입력 검증, UTF-8/LF 저장, 네트워크 미사용 |
-| 웹 앱 `src/everythingmarkdown/web/` | 인증, 작업 API(업로드·상태·미리보기·다운로드·삭제), 자식 프로세스 변환, 보관·정리, JSON 로그 완료. 업로드 화면 미착수 |
+| 웹 앱 `src/everythingmarkdown/web/` | 인증, 작업 API(업로드·상태·미리보기·다운로드·삭제), 자식 프로세스 변환, 보관·정리, JSON 로그 완료. 업로드·결과 화면 완료 |
 | Docker `Dockerfile`·`compose.yaml` | 미착수 |
 | CI `ci.yml` | ruff·mypy·pytest, `main` push마다 실행 |
 | 배포 `build.yml` | Docker Hub 빌드·푸시 job(수동). `Dockerfile` 전까지 실패 |
@@ -58,6 +58,13 @@ HTTPS는 nginx 등 리버스 프록시에서 처리한다. 설계 기준: [웹 �
 - `web/logs.py`: audit/access JSON Lines 파일, 크기 회전.
 - 보류한 계약은 TODO 웹 P3 "미구현으로 남긴 계약"에 기록.
 - 테스트 94개 통과(웹 33개), 실제 uvicorn에서 docx 업로드→변환→한글 파일명 다운로드→보관 N 재다운로드 410 확인.
+
+## 웹 P4 완료 내용 (2026-10-12)
+
+- 목업(`docs/web-mockup.html`)을 `web/templates`·`web/static`으로 옮기고 실제 API에 연결. 목업 전용 상태 막대와 예시 데이터는 제외.
+- 보관 정책과 업로드 한도는 서버 설정에서 화면에 표시.
+- 웹폰트 대신 시스템 글꼴을 사용해 외부 요청이 없다.
+- 테스트 98개 통과(웹 37개), Playwright로 데스크톱·모바일 흐름과 HTML 삽입 무해화 확인. 개발 서버에 한글 글꼴이 없어 스크린샷의 한글은 깨져 보였고 텍스트 내용은 DOM으로 확인함.
 
 ## 남은 위험
 

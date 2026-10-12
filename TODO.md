@@ -2,7 +2,7 @@
 
 - 최종 정리일: 2026-10-12
 - 제품: **개인용 웹 서비스**. 배포물은 Docker Hub의 통합 웹 서비스 이미지 하나다.
-- 현재 상태: 변환 코어·웹 P1~P3 완료. **다음은 웹 P4(화면)**, 웹 P5~P6 미착수. P4 화면 목업은 작성됨.
+- 현재 상태: 변환 코어·웹 P1~P4 완료. **다음은 웹 P5(Docker)**, 웹 P6 미착수.
 - 관련 문서: [진행 현황](PROGRESS.md) · [웹 서비스 설계·계획](docs/web-service-plan.md) · [릴리즈 정책](docs/releasing.md) · [P1 코어 검증](docs/p1-validation.md)
 - 2026-10-12 결정:
   - 데스크톱 GUI·CLI·P0 프로브·PyInstaller 패키징 폐기(Git 이력에 보존).
@@ -21,8 +21,8 @@
 | 웹 P1 구조 재정의 | 완료 | |
 | 웹 P2 인증 | 완료 | |
 | 웹 P3 업로드·변환·보관 | 완료 | 일부 계약 보류(아래) |
-| 웹 P4 화면 | **다음**(목업 완료) | 목업을 템플릿으로 구현 |
-| 웹 P5 Docker | 미착수 | `Dockerfile` 작성 후 Docker Hub 첫 푸시 |
+| 웹 P4 화면 | 완료 | |
+| 웹 P5 Docker | **다음** | `Dockerfile` 작성 후 Docker Hub 첫 푸시 |
 | 웹 P6 통합 검증·운영 문서 | 미착수 | |
 | 릴리즈 | 사용자 배포 요청 대기 | |
 
@@ -63,11 +63,12 @@
   - 로그 날짜 경계 회전·회전 파일 30일 정리(`LOG_RETENTION_DAYS`), 로그 쓰기 실패 시 readiness 실패·접수 중단.
   - 보관 N 결과의 동시 다운로드 참조 계수(두 번째 동시 전송이 삭제와 경합할 수 있음).
 
-## 웹 P4 — 개인용 웹 화면
+## 웹 P4 — 개인용 웹 화면 (완료)
 
 - [x] 초기 화면 목업 [docs/web-mockup.html](docs/web-mockup.html): 로그인·업로드·결과·실패·만료 등 12개 상태, 로고·파비콘 적용(2026-10-12).
-- [ ] `web/templates/{base,index,login}.html`, `web/static/`: 업로드·상태 폴링·원문 확인/복사/다운로드/삭제, 만료·실패·인증 만료 안내.
-- [ ] `tests/web/test_views.py`와 데스크톱/모바일 폭 브라우저 검증.
+- [x] `web/templates/{base,index,login}.html`, `web/static/{app.css,app.js,logo.ico}`: 목업 디자인 그대로 업로드(선택·끌어놓기)·1초 상태 폴링·원문 확인/복사/다운로드/삭제, 실패·거절·만료·인증 만료 안내, 화면에 보관 정책·한도 표시. 모든 문자열은 `textContent`로만 넣는다.
+- [x] `tests/web/test_views.py` 4개 테스트, Playwright(Chromium)로 1280px·390px 전체 흐름(로그인 실패→로그인→업로드→결과→다운로드→실패→기록 삭제→거절→만료→로그아웃)과 HTML·스크립트가 든 파일명·문서가 실행되지 않음을 확인.
+- [ ] 웹폰트 미사용: 목업의 IBM Plex 대신 시스템 글꼴(맑은 고딕·Apple SD 산돌고딕 Neo 등)을 쓴다. 목업과 같은 글꼴이 필요하면 OFL 폰트를 `web/static`에 넣는다(이미지 용량 증가).
 
 ## 웹 P5 — Docker 및 배포 구성
 
