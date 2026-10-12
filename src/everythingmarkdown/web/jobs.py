@@ -21,7 +21,7 @@ from .config import Settings
 ACTIVE_STATES = ("queued", "running")
 TIMEOUT_ERROR = "TIMEOUT"
 INTERRUPTED_ERROR = "INTERRUPTED"
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS jobs (
     id TEXT PRIMARY KEY,
@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS jobs (
     markdown_keep INTEGER NOT NULL,  -- snapshot of MARKDOWN_KEEP; N also deletes after first download
     markdown_ttl INTEGER NOT NULL,   -- retention or temp TTL, counted from success
     markdown_expires_at REAL,
-    markdown_gone INTEGER NOT NULL DEFAULT 0
+    markdown_gone INTEGER NOT NULL DEFAULT 0,
+    owner TEXT NOT NULL DEFAULT ''   -- '' for the password user, anonymous browser ID otherwise
 )
 """
 
@@ -48,14 +49,16 @@ class Jobs:
         self.root = settings.data_dir
         for name in ("uploads", "markdown", ".work"):
             (self.root / name).mkdir(parents=True, exist_ok=True)
-        # ponytail: one connection behind one lock; plenty for a single-user service.
+        # ponytail: one connection behind one lock; plenty for a handful of users; queries are tiny.
         self._db = sqlite3.connect(self.root / "app.db", check_same_thread=False, isolation_level=None)
         self._db.row_factory = sqlite3.Row
         self._lock = threading.Lock()
         version = self._db.execute("PRAGMA user_version").fetchone()[0]
-        if version not in (0, SCHEMA_VERSION):
+        if version not in (0, 1, SCHEMA_VERSION):
             raise RuntimeError(f"unsupported app.db schema version {version}")
         self._db.execute(SCHEMA)
+        if version == 1:  # 26.1.x databases: add job owner, existing jobs belong to the password user
+            self._db.execute("ALTER TABLE jobs ADD COLUMN owner TEXT NOT NULL DEFAULT ''")
         self._db.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
         self._queue: queue.Queue[str | None] = queue.Queue()
         self._stop = threading.Event()
@@ -80,10 +83,11 @@ class Jobs:
         rows = self._exec("SELECT * FROM jobs WHERE id = ?", (job_id,))
         return rows[0] if rows else None
 
-    def recent(self, limit: int = 20) -> list[dict[str, Any]]:
-        return self._exec("SELECT * FROM jobs ORDER BY created_at DESC LIMIT ?", (limit,))
+    def recent(self, owner: str = "", limit: int = 20) -> list[dict[str, Any]]:
+        sql = "SELECT * FROM jobs WHERE owner = ? ORDER BY created_at DESC LIMIT ?"
+        return self._exec(sql, (owner, limit))
 
-    def reserve(self, job_id: str, name: str, ext: str, size: int) -> bool:
+    def reserve(self, job_id: str, name: str, ext: str, size: int, owner: str = "") -> bool:
         """Insert a queued job unless running+queued already hit the limit."""
         now = time.time()
         s = self.settings
@@ -96,11 +100,11 @@ class Jobs:
                 return False
             self._db.execute(
                 "INSERT INTO jobs (id, name, ext, size, state, created_at, upload_expires_at,"
-                " markdown_keep, markdown_ttl) VALUES (?, ?, ?, ?, 'queued', ?, ?, ?, ?)",
+                " markdown_keep, markdown_ttl, owner) VALUES (?, ?, ?, ?, 'queued', ?, ?, ?, ?, ?)",
                 (job_id, name, ext, size, now,
                  None if s.upload_ttl is None else now + s.upload_ttl,
                  int(s.markdown_ttl is not None),
-                 s.temp_result_ttl if s.markdown_ttl is None else s.markdown_ttl),
+                 s.temp_result_ttl if s.markdown_ttl is None else s.markdown_ttl, owner),
             )
         return True
 
@@ -142,7 +146,8 @@ class Jobs:
     def start(self) -> None:
         self.recover()
         self.cleanup()
-        for target in (self._run_loop, self._cleanup_loop):
+        runners = [self._run_loop] * self.settings.conversion_workers
+        for target in (*runners, self._cleanup_loop):
             thread = threading.Thread(target=target, daemon=True)
             thread.start()
             self._threads.append(thread)
@@ -150,7 +155,8 @@ class Jobs:
 
     def stop(self) -> None:
         self._stop.set()
-        self._queue.put(None)
+        for _ in range(self.settings.conversion_workers):
+            self._queue.put(None)
         for thread in self._threads:
             thread.join(timeout=self.settings.conversion_timeout + 5)
         logs.audit("server_stopped")

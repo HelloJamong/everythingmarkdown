@@ -1,6 +1,11 @@
-"""Single-password login (.env APP_PASSWORD): signed cookie, Origin check, in-memory rate limit."""
+"""Single-password login (.env APP_PASSWORD): signed cookie, Origin check, in-memory rate limit.
+
+With AUTH_ENABLED=false there is no login: each browser gets an anonymous ID in the signed
+cookie and only sees its own jobs.
+"""
 
 import hmac
+import secrets
 import time
 from collections.abc import Awaitable, Callable
 from pathlib import Path
@@ -13,6 +18,7 @@ from fastapi.templating import Jinja2Templates
 from . import logs
 
 SESSION_MAX_AGE = 8 * 60 * 60
+ANON_SESSION_MAX_AGE = 30 * 24 * 60 * 60  # anonymous browser IDs outlive any retention period
 UNSAFE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 
 templates = Jinja2Templates(directory=Path(__file__).parent / "templates")
@@ -62,9 +68,24 @@ def session_state(request: Request) -> str:
     return "ok"
 
 
+def auth_enabled(request: Request) -> bool:
+    return bool(request.app.state.settings.auth_enabled)
+
+
 def require_login(request: Request) -> None:
-    if session_state(request) != "ok":
+    if auth_enabled(request) and session_state(request) != "ok":
         raise HTTPException(status_code=401)
+
+
+def current_owner(request: Request) -> str:
+    """Job owner key: "" for the single password user, a per-browser random ID without login."""
+    if auth_enabled(request):
+        return ""
+    uid = request.session.get("uid")
+    if not isinstance(uid, str) or len(uid) != 32:
+        uid = secrets.token_hex(16)
+        request.session["uid"] = uid
+    return uid
 
 
 async def check_origin(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
@@ -80,7 +101,7 @@ async def check_origin(request: Request, call_next: Callable[[Request], Awaitabl
 
 @router.get("/login")
 def login_page(request: Request, expired: str | None = None) -> Response:
-    if session_state(request) == "ok":
+    if not auth_enabled(request) or session_state(request) == "ok":
         return RedirectResponse("/", status_code=303)
     notice = "로그인이 만료되었습니다. 다시 로그인하세요." if expired is not None else None
     return templates.TemplateResponse(request, "login.html", {"notice": notice})
@@ -88,6 +109,8 @@ def login_page(request: Request, expired: str | None = None) -> Response:
 
 @router.post("/login")
 def login(request: Request, password: str = Form("")) -> Response:
+    if not auth_enabled(request):
+        return RedirectResponse("/", status_code=303)
     ip = logs.client_ip(request)
     limiter: LoginLimiter = request.app.state.limiter
     if limiter.blocked(ip):
@@ -111,6 +134,8 @@ def login(request: Request, password: str = Form("")) -> Response:
 
 @router.post("/logout")
 def logout(request: Request) -> Response:
+    if not auth_enabled(request):
+        return RedirectResponse("/", status_code=303)
     request.session.clear()
     _audit("logout", request)
     return RedirectResponse("/login", status_code=303)

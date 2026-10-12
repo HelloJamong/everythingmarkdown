@@ -57,11 +57,13 @@ sed -i "s/^EMD_UID=.*/EMD_UID=$(id -u)/; s/^EMD_GID=.*/EMD_GID=$(id -g)/" .env
 
 | 항목 | 설명 |
 |---|---|
+| `AUTH_ENABLED` | `true`(기본)면 비밀번호 로그인. `false`면 로그인 없이 사용([폐쇄망 설치](#로그인-없이-쓰기-auth_enabledfalse) 참고) |
 | `APP_PASSWORD` | 로그인 비밀번호. **12자 이상**, 예제 값 그대로면 시작하지 않음 |
 | `EMD_BIND`, `EMD_PORT` | 앱 포트. 기본 `127.0.0.1:8000`(nginx가 같은 서버에서 연결) |
 | `COOKIE_SECURE` | HTTPS 뒤에서는 `true`(기본). nginx 없이 http로 시험할 때만 `false` |
 | `UPLOAD_KEEP`, `MARKDOWN_KEEP` | 원본·결과 보관 `Y`/`N`. `Y`면 `*_RETENTION_DAYS` 일수 필수 |
 | `FORWARDED_ALLOW_IPS` | nginx 주소(실제 접속 IP를 믿을 프록시) |
+| `MAX_ACTIVE_JOBS`, `CONVERSION_WORKERS` | 전체 대기·실행 작업 한도(기본 3), 동시 변환 수(기본 1) |
 
 나머지 항목은 `.env` 안의 설명을 참고하세요.
 
@@ -131,6 +133,83 @@ after=$(docker image inspect -f '{{.Id}}' "$(docker compose config --images)")
 - **백업:** `data/app.db`와 보관(Y)으로 설정한 `data/uploads`·`data/markdown`. `data/.work`는 제외합니다. 멈춘 상태에서 복사하는 것이 안전합니다: `docker compose stop && cp -a data data.bak && docker compose start`.
 - **로그:** `logs/audit.log`·`logs/access.log`(JSON Lines, 10 MiB마다 회전·10개 보관)는 파일 보관 정책과 별개로 남습니다.
 
+## 폐쇄망 설치
+
+인터넷이 없는 서버에서는 Docker Hub와 GitHub에 접속할 수 없으므로, 인터넷이 되는 PC에서 Release 파일을 받아 옮긴 뒤 설치합니다.
+서비스는 실행 중 외부 접속을 하지 않습니다(변환 엔진·화면 모두 오프라인 동작).
+
+### 1. 반입할 파일 받기 (인터넷 되는 PC)
+
+[GitHub Release](https://github.com/HelloJamong/everythingmarkdown/releases)에서 설치할 버전의 파일 4개를 받습니다.
+
+| 파일 | 내용 |
+|---|---|
+| `everythingmarkdown-image-<버전>.tar.gz` | Docker 이미지 번들(`docker save` + gzip, 약 170 MB) |
+| `everythingmarkdown-image-<버전>.tar.gz.sha256` | 번들 체크섬 |
+| `docker-compose.yml` | 실행 구성 |
+| `env.example` | 설정 견본(`.env`로 저장) |
+
+```sh
+V=<버전>   # 설치할 버전, 예: 26.1.3
+base=https://github.com/HelloJamong/everythingmarkdown/releases/download/$V
+for f in everythingmarkdown-image-$V.tar.gz everythingmarkdown-image-$V.tar.gz.sha256 docker-compose.yml env.example; do
+  curl -fsSLO "$base/$f"
+done
+```
+
+USB 등으로 네 파일을 폐쇄망 서버에 옮깁니다.
+
+### 2. 이미지 불러오기와 구성 (폐쇄망 서버)
+
+```sh
+V=<버전>
+sha256sum -c everythingmarkdown-image-$V.tar.gz.sha256   # 옮기는 중 손상 확인
+docker load -i everythingmarkdown-image-$V.tar.gz        # igor0670/everythingmarkdown:$V 로드
+
+mkdir -p ~/everythingmarkdown/data ~/everythingmarkdown/logs
+cp docker-compose.yml ~/everythingmarkdown/
+cp env.example ~/everythingmarkdown/.env
+cd ~/everythingmarkdown && chmod 600 .env
+sed -i "s/^EMD_UID=.*/EMD_UID=$(id -u)/; s/^EMD_GID=.*/EMD_GID=$(id -g)/" .env
+```
+
+`.env`에서 아래를 바꿉니다(nginx 없이 http로 직접 접속하는 경우).
+
+| 항목 | 값 | 이유 |
+|---|---|---|
+| `EMD_IMAGE` | `igor0670/everythingmarkdown:<버전>` | `latest`가 아닌 불러온 버전으로 고정 |
+| `EMD_BIND` | `0.0.0.0` | 다른 PC에서 접속 |
+| `COOKIE_SECURE` | `false` | http에서는 `true`면 로그인이 유지되지 않음 |
+| `APP_PASSWORD` | 12자 이상 | `AUTH_ENABLED=false`면 무시 |
+| `FORWARDED_ALLOW_IPS` | 기본값 유지 | 프록시가 없으므로 |
+
+```sh
+docker compose up -d       # 이미지가 이미 있으므로 인터넷에서 받지 않음
+docker compose ps          # healthy 확인 후 http://<서버 IP>:8000 접속
+```
+
+방화벽에서 8000/tcp를 열어야 할 수 있습니다.
+
+### 로그인 없이 쓰기 (`AUTH_ENABLED=false`)
+
+신뢰할 수 있는 폐쇄망에서는 `.env`에 `AUTH_ENABLED=false`를 넣어 비밀번호 없이 쓸 수 있습니다.
+
+- 접속하면 로그인 화면 없이 바로 업로드 화면이 열리고, 로그아웃 버튼은 보이지 않습니다.
+- **여러 사람이 동시에 써도 서로의 작업이 섞이지 않습니다.** 브라우저마다 익명 ID를 쿠키로 발급하고, 목록·미리보기·다운로드·삭제는 자기 브라우저가 올린 작업만 됩니다.
+- 익명 ID는 30일 유지되고, 서명 키를 `data/.session_key`에 저장해 재시작 후에도 이어집니다. 쿠키를 지우거나 다른 브라우저로 접속하면 이전 작업은 보이지 않습니다(파일은 보관 정책대로 정리됨).
+- 대기 한도와 변환 처리량은 모든 사용자가 함께 씁니다. 사용자가 많으면 `MAX_ACTIVE_JOBS`(전체 대기·실행 한도)와 `CONVERSION_WORKERS`(동시 변환 수)를 늘립니다. 변환 1개당 CPU 1코어·수백 MB 메모리를 쓰므로 `docker-compose.yml`의 `mem_limit`·`cpus`도 함께 늘립니다.
+- 망 안의 누구나 쓸 수 있고 사용자 구분은 접속 IP·익명 ID뿐입니다. 서버가 시작할 때 `logs/audit.log`에 `auth_disabled`가 기록됩니다.
+
+### 3. 버전 올리기·되돌리기
+
+새 버전의 번들을 같은 방법으로 반입해 `docker load` 한 뒤 `.env`의 `EMD_IMAGE` 버전을 바꾸고 `docker compose up -d` 합니다.
+되돌릴 때는 이전 버전으로 `EMD_IMAGE`를 바꿉니다(이전 이미지가 남아 있어야 함). `docker compose pull`과 자동 갱신 스크립트는 인터넷이 필요해 쓸 수 없습니다.
+
+### nginx 없이 쓸 때 주의
+
+- 비밀번호·로그인 쿠키·문서가 암호화되지 않은 채 망 안을 오갑니다. 망 안을 신뢰할 수 없거나 문서가 민감하면 내부 인증서로 nginx 등 HTTPS 프록시를 붙이세요([nginx 연결](#nginx-연결-https)).
+- 업로드 수신 시간 제한은 nginx가 맡도록 되어 있어, 프록시가 없으면 아주 느린 업로드가 연결을 오래 붙잡을 수 있습니다. 파일 크기 제한(25 MiB)은 앱이 그대로 적용합니다.
+
 ## 구성
 
 ```text
@@ -181,7 +260,7 @@ docker compose up -d
 | `Dockerfile`, `.dockerignore` | 이미지(비루트, healthcheck, TLS 미포함) |
 | `docker-compose.yml`, `.env.example` | 실행 구성(Release에도 첨부) |
 | `.github/workflows/ci.yml` | `main` 푸시·PR마다 ruff·mypy·pytest |
-| `.github/workflows/build.yml` | 버전 태그 푸시 시 검사 → 이미지 푸시 → GitHub Release 게시 |
+| `.github/workflows/build.yml` | 버전 태그 푸시 시 검사 → 이미지 푸시 → GitHub Release 게시(설정 파일·이미지 번들 첨부) |
 | `licenses/` | wheel에 원문이 없는 의존성 라이선스 보충본 |
 | `docs/third-party-licenses.md` | 의존성 라이선스 목록(이미지에도 포함) |
 
@@ -209,7 +288,7 @@ print(result.output_path)  # <launch_dir>/convert_result/input.md
 
 1. `changelog.md` 맨 위에 `## [YY.메이저.마이너] - 날짜` 항목(Added/Changed/Fixed/Removed 중 해당 섹션)을 쓰고, `pyproject.toml` 버전을 맞춘 뒤 `uv lock`.
 2. 릴리즈 커밋(`chore: <버전> 릴리즈`) 후 해당 changelog 섹션을 메시지로 annotated tag를 만들어 푸시합니다(`v` 접두사 없음).
-3. `build.yml`이 검사 → 태그·버전·changelog 일치 확인 → Docker Hub `latest`·버전 이미지 푸시 → GitHub Release(같은 노트 + `docker-compose.yml`·`env.example`)를 처리합니다.
+3. `build.yml`이 검사 → 태그·버전·changelog 일치 확인 → Docker Hub `latest`·버전 이미지 푸시 → GitHub Release(같은 노트 + `docker-compose.yml`·`env.example`·폐쇄망용 이미지 번들 `.tar.gz`와 체크섬)를 처리합니다.
 
 공개된 태그와 Release는 덮어쓰지 않고, 고칠 것이 있으면 새 버전으로 냅니다.
 

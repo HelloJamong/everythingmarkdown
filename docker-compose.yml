@@ -1,4 +1,6 @@
 # Runtime settings come from .env (copy .env.example; the release asset is env.example). See README.
+# Air-gapped: `docker load -i everythingmarkdown-image-<ver>.tar.gz`, pin EMD_IMAGE to that version;
+# `docker compose up -d` then uses the local image without pulling.
 services:
   everythingmarkdown:
     image: ${EMD_IMAGE:-igor0670/everythingmarkdown:latest}

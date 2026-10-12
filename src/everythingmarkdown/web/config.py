@@ -17,6 +17,8 @@ class ConfigError(Exception):
 class Settings:
     password: str
     cookie_secure: bool = True
+    # False: no login; each browser gets an anonymous ID and sees only its own jobs.
+    auth_enabled: bool = True
     data_dir: Path = Path("/data")
     log_dir: Path = Path("/logs")
     # Retention TTLs in seconds, snapshotted per job. None = keep N (delete after use).
@@ -30,6 +32,7 @@ class Settings:
     max_file_bytes: int = 25 * MIB
     max_request_bytes: int = 26 * MIB
     max_active_jobs: int = 3
+    conversion_workers: int = 1
     conversion_timeout: float = 120.0
 
 
@@ -51,18 +54,27 @@ def _keep_ttl(environ: Mapping[str, str], prefix: str) -> int | None:
     return _positive_int(environ, f"{prefix}_RETENTION_DAYS") * 24 * 60 * 60
 
 
+def _bool(environ: Mapping[str, str], name: str, default: str) -> bool:
+    value = environ.get(name, default).strip().lower()
+    if value not in {"true", "false"}:
+        raise ConfigError(f"{name} must be true or false")
+    return value == "true"
+
+
 def load_settings(environ: Mapping[str, str]) -> Settings:
+    auth_enabled = _bool(environ, "AUTH_ENABLED", "true")
     password = environ.get("APP_PASSWORD", "")
-    if not password.strip() or password == EXAMPLE_PASSWORD:
-        raise ConfigError("APP_PASSWORD must be set to a non-example value")
-    if len(password) < MIN_PASSWORD_LENGTH:
-        raise ConfigError(f"APP_PASSWORD must be at least {MIN_PASSWORD_LENGTH} characters")
-    secure = environ.get("COOKIE_SECURE", "true").strip().lower()
-    if secure not in {"true", "false"}:
-        raise ConfigError("COOKIE_SECURE must be true or false")
+    if auth_enabled:
+        if not password.strip() or password == EXAMPLE_PASSWORD:
+            raise ConfigError("APP_PASSWORD must be set to a non-example value")
+        if len(password) < MIN_PASSWORD_LENGTH:
+            raise ConfigError(f"APP_PASSWORD must be at least {MIN_PASSWORD_LENGTH} characters")
     return Settings(
-        password=password,
-        cookie_secure=secure == "true",
+        password=password if auth_enabled else "",
+        cookie_secure=_bool(environ, "COOKIE_SECURE", "true"),
+        auth_enabled=auth_enabled,
+        max_active_jobs=_positive_int(environ, "MAX_ACTIVE_JOBS", 3),
+        conversion_workers=_positive_int(environ, "CONVERSION_WORKERS", 1),
         data_dir=Path(environ.get("DATA_DIR", "/data")),
         log_dir=Path(environ.get("LOG_DIR", "/logs")),
         upload_ttl=_keep_ttl(environ, "UPLOAD"),

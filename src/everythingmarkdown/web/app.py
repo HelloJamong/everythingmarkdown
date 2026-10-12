@@ -1,5 +1,6 @@
 """App factory. Run: uvicorn --factory everythingmarkdown.web.app:create_app --proxy-headers"""
 
+import logging
 import os
 import secrets
 from collections.abc import AsyncIterator
@@ -28,6 +29,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         # Unwritable LOG_DIR/DATA_DIR raises here, so the server refuses to start.
         logs.setup(settings.log_dir, settings.log_max_bytes, settings.log_backup_count)
+        if not settings.auth_enabled:
+            logs.audit("auth_disabled")
+            logging.getLogger("uvicorn.error").warning(
+                "AUTH_ENABLED=false: no password; every browser on the network can use this service")
         app.state.jobs = Jobs(settings)
         app.state.jobs.start()
         yield
@@ -36,12 +41,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
     app.state.settings = settings
     app.state.limiter = auth.LoginLimiter()
-    # Fresh key per start: a restart or APP_PASSWORD change logs every session out.
     app.add_middleware(
         SessionMiddleware,
-        secret_key=secrets.token_urlsafe(32),
+        secret_key=_session_key(settings),
         session_cookie="emd_session",
-        max_age=auth.SESSION_MAX_AGE,
+        max_age=auth.SESSION_MAX_AGE if settings.auth_enabled else auth.ANON_SESSION_MAX_AGE,
         same_site="lax",
         https_only=settings.cookie_secure,
     )
@@ -53,9 +57,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.get("/")
     def index(request: Request) -> Response:
-        state = auth.session_state(request)
-        if state != "ok":
-            return RedirectResponse("/login?expired" if state == "expired" else "/login", status_code=303)
+        if settings.auth_enabled:
+            state = auth.session_state(request)
+            if state != "ok":
+                return RedirectResponse("/login?expired" if state == "expired" else "/login", status_code=303)
+        else:
+            auth.current_owner(request)  # hand out the anonymous browser ID on first visit
         return auth.templates.TemplateResponse(request, "index.html", _screen(settings))
 
     @app.get("/healthz")
@@ -63,6 +70,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"status": "ok"}
 
     return app
+
+
+def _session_key(settings: Settings) -> str:
+    """Password mode: fresh key per start, so a restart or password change logs everyone out.
+    No-password mode: a key kept in DATA_DIR, so browsers keep reaching their own jobs after a restart."""
+    if settings.auth_enabled:
+        return secrets.token_urlsafe(32)
+    settings.data_dir.mkdir(parents=True, exist_ok=True)
+    path = settings.data_dir / ".session_key"
+    try:
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError:
+        return path.read_text(encoding="ascii").strip()
+    with os.fdopen(fd, "w", encoding="ascii") as handle:
+        key = secrets.token_urlsafe(32)
+        handle.write(key)
+    return key
 
 
 def _days(seconds: int) -> str:
@@ -73,6 +97,7 @@ def _screen(settings: Settings) -> dict[str, Any]:
     """Limits and retention shown next to the upload box."""
     temp_minutes = settings.temp_result_ttl // 60
     return {
+        "auth_enabled": settings.auth_enabled,
         "version": version("everythingmarkdown"),
         "repo_url": REPO_URL,
         "accept": ",".join(SUPPORTED_EXTENSIONS),

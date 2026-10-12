@@ -1,6 +1,7 @@
 # Release: pushing a version tag (e.g. 26.1.0, no "v") builds and pushes the Docker image.
 # Pushes `latest` and the version tag from one build, then publishes the GitHub Release with
-# the changelog section as notes and docker-compose.yml + env.example attached (README > 릴리즈).
+# the changelog section as notes, docker-compose.yml + env.example, and an offline image bundle
+# (docker save | gzip) for air-gapped installs attached (README > 릴리즈, 폐쇄망 설치).
 name: build
 
 on:
@@ -68,11 +69,18 @@ jobs:
           mkdir dist
           cp docker-compose.yml dist/docker-compose.yml
           cp .env.example dist/env.example
+      - name: Offline image bundle (air-gapped installs load it with docker load)
+        env:
+          IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/everythingmarkdown:${{ github.ref_name }}
+        run: |
+          docker pull "$IMAGE"
+          docker save "$IMAGE" | gzip > "dist/everythingmarkdown-image-$TAG.tar.gz"
+          (cd dist && sha256sum "everythingmarkdown-image-$TAG.tar.gz" > "everythingmarkdown-image-$TAG.tar.gz.sha256")
+          ls -lh dist
       - name: Create or update the GitHub Release
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" dist/docker-compose.yml dist/env.example --clobber
+            gh release upload "$TAG" dist/* --clobber
           else
-            gh release create "$TAG" --verify-tag --title "$TAG" --notes-file notes.md \
-              dist/docker-compose.yml dist/env.example
+            gh release create "$TAG" --verify-tag --title "$TAG" --notes-file notes.md dist/*
           fi

@@ -1,4 +1,5 @@
-"""Job API: upload, status, preview, download, delete. Every route requires login."""
+"""Job API: upload, status, preview, download, delete. Every route requires login (when enabled)
+and only ever reaches the caller's own jobs: another owner's job is indistinguishable from a missing one."""
 
 import re
 import secrets
@@ -13,7 +14,7 @@ from starlette.datastructures import UploadFile
 from ..markitdown_adapter import SUPPORTED_EXTENSIONS
 from ..models import ConversionError, ErrorCode
 from . import logs
-from .auth import require_login
+from .auth import current_owner, require_login
 from .jobs import INTERRUPTED_ERROR, TIMEOUT_ERROR, Jobs
 
 PREVIEW_BYTES = 64 * 1024
@@ -62,7 +63,7 @@ def _view(job: dict[str, Any]) -> dict[str, Any]:
 
 def _get(request: Request, job_id: str) -> dict[str, Any]:
     job = _jobs(request).get(job_id) if _JOB_ID.fullmatch(job_id) else None
-    if job is None:
+    if job is None or job["owner"] != current_owner(request):
         raise HTTPException(status_code=404)
     return job
 
@@ -110,7 +111,7 @@ async def upload(request: Request) -> Response:
         if size > settings.max_file_bytes:
             jobs.remove_upload(job_id)
             return _reject(request, 413, "TOO_LARGE")
-        if not jobs.reserve(job_id, name, ext, size):
+        if not jobs.reserve(job_id, name, ext, size, owner=current_owner(request)):
             jobs.remove_upload(job_id)
             return _reject(request, 429, "QUEUE_FULL")
     finally:
@@ -122,7 +123,7 @@ async def upload(request: Request) -> Response:
 
 @router.get("")
 def list_jobs(request: Request) -> list[dict[str, Any]]:
-    return [_view(job) for job in _jobs(request).recent()]
+    return [_view(job) for job in _jobs(request).recent(current_owner(request))]
 
 
 @router.get("/{job_id}")
