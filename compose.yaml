@@ -5,9 +5,9 @@ services:
     env_file: .env
     # Run as the owner of ./data and ./logs so bind mounts are writable without sudo.
     user: "${EMD_UID:-10001}:${EMD_GID:-10001}"
-    # Loopback only: the reverse proxy on this host forwards to it. Never publish it publicly.
+    # Loopback by default: the reverse proxy on this host forwards to it. EMD_BIND=0.0.0.0 only for LAN http tests.
     ports:
-      - "127.0.0.1:${EMD_PORT:-8000}:8000"
+      - "${EMD_BIND:-127.0.0.1}:${EMD_PORT:-8000}:8000"
     volumes:
       - ./data:/data
       - ./logs:/logs

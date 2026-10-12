@@ -11,7 +11,7 @@
   - 릴리즈는 Docker 이미지 + changelog·annotated tag·GitHub Release 노트.
   - HTTPS는 자체 구현하지 않고 nginx 등 리버스 프록시에서 처리. 앱은 HTTP만 제공.
   - Docker 이미지는 `linux/amd64` 단일 아키텍처. Docker Hub 저장소는 공개 상태.
-- 배포 요청 전에는 버전 항목·태그·Release를 만들지 않는다. 첫 배포 시 `26.1.0`으로 기록한다.
+- 배포 요청 전에는 버전 항목·태그·Release를 만들지 않는다. 첫 배포는 `26.1.0`(2026-10-12).
 
 ## 단계별 상태
 
@@ -89,9 +89,9 @@
 - [ ] 실제 도메인·nginx 위치(같은 Docker 네트워크/호스트/다른 서버)·호스트 자원 확인(현재 미확인). 확인 후 A14 HTTPS 경유 검증.
 - [x] 이미지 런타임 의존성 55개 라이선스 고지 확정([목록](docs/third-party-licenses.md)). wheel에 원문이 없는 markitdown·magika·flatbuffers·cobble 원문을 `licenses/`에 보충, 이미지 `/usr/share/doc/everythingmarkdown/`에 포함.
 
-## 최초 릴리즈 — 사용자 배포 요청 후에만
+## 최초 릴리즈 26.1.0 (2026-10-12 사용자 요청)
 
-- [ ] `changelog.md`에 `26.1.0`과 실제 배포 날짜·변경 내역·미검증 범위 작성, `pyproject.toml` 버전 일치.
+- [x] `changelog.md`에 `26.1.0`과 배포 날짜·변경 내역·미검증 범위 작성, `pyproject.toml`·`uv.lock` 버전 `26.1.0`.
 - [ ] 릴리즈 커밋·annotated tag `26.1.0` push → `build.yml`이 `latest`·`26.1.0` 이미지 푸시, 두 태그 digest 일치 확인.
 - [ ] 동일 노트로 GitHub Release 게시.
 

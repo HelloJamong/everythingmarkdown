@@ -33,7 +33,8 @@ docker compose ps        # STATUS가 healthy인지 확인
 ```
 
 - 컨테이너는 `EMD_UID:EMD_GID` 사용자로 실행된다. `./data`·`./logs`를 같은 사용자가 소유하면 sudo 없이 쓸 수 있다. 쓸 수 없으면 앱이 시작을 거부한다.
-- 앱 포트는 `127.0.0.1:${EMD_PORT}`에만 열린다. 외부에 직접 노출하지 않는다.
+- 앱 포트는 기본적으로 `127.0.0.1:${EMD_PORT}`에만 열린다. 외부에 직접 노출하지 않는다.
+- nginx 없이 LAN에서 http로 시험할 때만 `.env`에 `EMD_BIND=0.0.0.0`, `COOKIE_SECURE=false`를 넣는다. 방화벽에서 해당 포트를 열어야 할 수 있다. 시험이 끝나면 되돌린다.
 - 루트 파일시스템 읽기 전용, 모든 capability 제거, no-new-privileges, 메모리 2 GB·CPU 2개·PID 256 한도(실측 후 조정).
 - `.env`는 Git·이미지에 넣지 않는다. 비밀번호가 `.env`와 컨테이너 환경에 평문으로 남는다.
 - 비밀번호 변경: `.env` 수정 후 `docker compose up -d`. 모든 로그인이 풀린다.
