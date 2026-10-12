@@ -56,6 +56,7 @@
 
 ## 웹 P4 — 개인용 웹 화면
 
+- [x] 초기 화면 목업 [docs/web-mockup.html](docs/web-mockup.html): 로그인·업로드·결과·실패·만료 등 12개 상태, 로고·파비콘 적용(2026-10-12).
 - [ ] `web/templates/{base,index,login}.html`, `web/static/`: 업로드·상태 폴링·원문 확인/복사/다운로드/삭제, 만료·실패·인증 만료 안내.
 - [ ] `tests/web/test_views.py`와 데스크톱/모바일 폭 브라우저 검증.
 
