@@ -51,6 +51,24 @@ class ConversionIntegrationTests(unittest.TestCase):
             self.assertEqual(ErrorCode.OUTPUT_CONFLICT, error.exception.code)
             self.assertEqual(original, result.output_path.read_bytes())
 
+    def test_same_name_in_different_launch_dirs_is_independent(self):
+        # Web jobs each get their own launch_dir (/data/.work/<job_id>) for a shared upload name.
+        with tempfile.TemporaryDirectory() as directory:
+            service = ConversionService()
+            outputs = []
+            for job in ("job-a", "job-b"):
+                upload = Path(directory) / "uploads" / job / "input.txt"
+                upload.parent.mkdir(parents=True)
+                upload.write_text(f"content of {job}", encoding="utf-8")
+                launch = Path(directory) / ".work" / job
+                launch.mkdir(parents=True)
+                result = service.convert(ConversionRequest(upload, launch))
+                self.assertEqual(launch / "convert_result" / "input.md", result.output_path)
+                outputs.append(result.output_path)
+            self.assertIn("job-a", outputs[0].read_text(encoding="utf-8"))
+            self.assertNotIn("job-b", outputs[0].read_text(encoding="utf-8"))
+            self.assertIn("job-b", outputs[1].read_text(encoding="utf-8"))
+
     def test_corrupt_pdf_is_safe_conversion_error(self):
         with tempfile.TemporaryDirectory() as directory:
             launch = Path(directory)

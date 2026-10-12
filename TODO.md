@@ -2,11 +2,12 @@
 
 - 최종 정리일: 2026-10-12
 - 제품: **개인용 웹 서비스**. 배포물은 Docker Hub의 통합 웹 서비스 이미지 하나다.
-- 현재 상태: 변환 코어 완료. **웹 P1(구조 재정의) 진행 중**, 웹 P2~P6 미착수.
+- 현재 상태: 변환 코어·웹 P1(구조 재정의) 완료. **다음은 웹 P2**, 웹 P3~P6 미착수. P4 화면 목업은 작성됨.
 - 관련 문서: [진행 현황](PROGRESS.md) · [웹 서비스 설계·계획](docs/web-service-plan.md) · [릴리즈 정책](docs/releasing.md) · [P1 코어 검증](docs/p1-validation.md)
 - 2026-10-12 결정:
   - 데스크톱 GUI·CLI·P0 프로브·PyInstaller 패키징 폐기(Git 이력에 보존).
-  - 웹 런타임 의존성(FastAPI·Uvicorn·Jinja2·python-multipart·bcrypt·itsdangerous)을 기본 의존성으로 승인. 웹 P2에서 추가한다.
+  - 웹 런타임 의존성(FastAPI·Uvicorn·Jinja2·python-multipart·itsdangerous)을 기본 의존성으로 승인. 웹 P2에서 추가한다.
+  - 인증 간소화: `.env`의 `APP_PASSWORD` 하나로 제3자 접근 차단. DB 계정·bcrypt·서버 세션·reset 명령·CSRF 토큰 없음.
   - 릴리즈는 Docker 이미지 + changelog·annotated tag·GitHub Release 노트.
   - HTTPS는 자체 구현하지 않고 nginx 등 리버스 프록시에서 처리. 앱은 HTTP만 제공.
   - Docker 이미지는 `linux/amd64` 단일 아키텍처. Docker Hub 저장소는 공개 상태.
@@ -17,10 +18,10 @@
 | 단계 | 상태 | 다음 조치 |
 |---|---|---|
 | 변환 코어 | 완료 | 웹 P3에서 자식 프로세스로 호출 |
-| 웹 P1 구조 재정의 | **진행 중** | 데스크톱 자산 삭제, 동명 파일 회귀 테스트 |
-| 웹 P2 인증 | 미착수 | 웹 의존성 추가부터 |
+| 웹 P1 구조 재정의 | 완료 | |
+| 웹 P2 인증 | **다음** | 웹 의존성 추가부터 |
 | 웹 P3 업로드·변환·보관 | 미착수 | |
-| 웹 P4 화면 | 미착수 | |
+| 웹 P4 화면 | 목업 완료 | 템플릿 구현은 P3 이후 |
 | 웹 P5 Docker | 미착수 | `Dockerfile` 작성 후 Docker Hub 첫 푸시 |
 | 웹 P6 통합 검증·운영 문서 | 미착수 | |
 | 릴리즈 | 사용자 배포 요청 대기 | |
@@ -32,25 +33,25 @@
 - [x] 포맷별 단일 컨버터 등록, 기본 컨버터·플러그인 비활성(`markitdown_adapter.py`).
 - [x] 7개 포맷 실제 엔진 변환, 네트워크 미사용, 손상·빈 결과 안전 처리 테스트. 근거: [P1 검증 기록](docs/p1-validation.md).
 
-## 웹 P1 — 구조 재정의 (진행 중)
+## 웹 P1 — 구조 재정의 (완료)
 
 - [x] README·릴리즈 정책·웹 계획·TODO·PROGRESS를 웹 서비스 기준으로 재작성.
 - [x] `pyproject.toml`에서 CLI/GUI 진입점, `build` 그룹(PyInstaller), 로고 패키지 데이터 제거, `uv.lock` 갱신.
 - [x] `build.yml`에서 Windows/macOS 빌드 job 제거, Docker job만 유지.
 - [x] 통합 테스트에서 GUI/CLI 결과 일치 테스트 제거.
 - [x] 데스크톱 자산 파일 삭제: `gui.py`·`cli.py`·`__main__.py`·`p0.py`·`logo.png`, 관련 테스트, `packaging/`, `scripts/sha256sums.py`, `assets/logo.icns`, `DESIGN.md`, `docs/{design,test-spec,acceptance-matrix,p0-validation,p2-validation}.md`, `docs/gui-mockup.html`, `docs/evidence/{p0,p2}-*`.
-- [ ] 서로 다른 launch_dir에서 동명 파일 변환이 독립적이라는 회귀 테스트 추가.
+- [x] 서로 다른 launch_dir에서 동명 파일 변환이 독립적이라는 회귀 테스트 추가(`test_same_name_in_different_launch_dirs_is_independent`, 61개 테스트 통과).
 
-## 웹 P2 — 웹 기반과 단일 계정 인증
+## 웹 P2 — 웹 기반과 비밀번호 인증
 
 - [ ] 승인된 웹 의존성을 `pyproject.toml`·`uv.lock`에 추가, 서버 진입점 정의.
-- [ ] `web/{app,config,auth,store}.py`: `.env` 최초 비밀번호 bootstrap/reset, 비밀번호 전용 로그인, SQLite 스키마, 세션·CSRF·로그인 속도 제한, 기본 키 시작 거부.
-- [ ] Secure 쿠키를 프록시 없는 로컬 개발에서 끌지 결정.
+- [ ] `web/{app,config,auth}.py`: `APP_PASSWORD` 검증(누락·예제·12자 미만 시작 거부), 로그인/로그아웃, 시작 시 랜덤 키 서명 쿠키(8시간), Origin 검사, IP당 5회/분 로그인 제한.
+- [x] Secure 쿠키는 기본 켜고 LAN 직접 테스트용 `COOKIE_SECURE=false`만 허용(2026-10-12 결정).
 - [ ] 로그 기반(access/audit JSON Lines) 착수, `tests/web/test_auth.py`.
 
 ## 웹 P3 — 업로드·변환·저장 수명주기
 
-- [ ] `web/{routes,jobs,worker,cleanup,audit}.py`: 작업별 경로·소유권 검사, 제한된 대기열, 자식 프로세스 변환·timeout 종료, 재시작 시 interrupted 처리.
+- [ ] `web/{routes,jobs,worker,cleanup,audit,store}.py`: SQLite 작업 저장소, 작업별 경로 검사, 제한된 대기열, 자식 프로세스 변환·timeout 종료, 재시작 시 interrupted 처리.
 - [ ] 원본/Markdown 독립 보관 Y/N·일수, 시작/5분 주기 정리, 삭제 실패 재시도, 로그 회전.
 - [ ] `tests/web/test_{jobs,upload_limits,retention,logging}.py`.
 
@@ -63,7 +64,7 @@
 ## 웹 P5 — Docker 및 배포 구성
 
 - [ ] `Dockerfile`(Python 3.12, 잠긴 의존성, 비루트, healthcheck, TLS 미포함), `compose.yaml`(`./data:/data`, `./logs:/logs`), `.dockerignore`, `.env.example`.
-- [ ] `docs/web-deployment.md`: nginx 리버스 프록시 연결 예시(HTTPS는 프록시에서 종료)·forwarded 헤더 신뢰 범위·secret 주입.
+- [ ] `docs/web-deployment.md`: nginx 리버스 프록시 연결 예시(HTTPS는 프록시에서 종료)·forwarded 헤더 신뢰 범위·`.env` 권한.
 - [ ] 이미지 build/up/health, 재시작 후 데이터 유지 검증.
 - [x] `build.yml` Docker job을 `linux/amd64`로 고정.
 - [ ] 공개 저장소이므로 이미지 레이어에 비밀·`.env`·데이터가 없는지 확인.
