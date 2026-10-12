@@ -1,4 +1,4 @@
-"""JSON Lines audit/access logs under LOG_DIR (web-service-plan.md §4.2).
+"""JSON Lines audit/access logs under LOG_DIR.
 
 Never log passwords, cookies, bodies, document text, or original file names; jobs are tracked by ID.
 """

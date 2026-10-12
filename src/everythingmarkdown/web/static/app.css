@@ -1,4 +1,4 @@
-/* Ported from docs/web-mockup.html. No web fonts: the service makes no external requests. */
+/* No web fonts: the service makes no external requests. */
 :root {
   --paper: #F3F4F1;
   --sheet: #FFFFFF;
@@ -41,6 +41,10 @@ button, input { font: inherit; color: inherit; }
 .wordmark { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px; letter-spacing: -.01em; margin: 0; }
 /* 로고 원본은 256px 캔버스에 여백이 있어 표시 크기보다 조금 크게 둔다 */
 .wordmark img { width: 36px; height: 36px; margin: -4px -2px; }
+.top-actions { display: flex; align-items: center; gap: 12px; }
+.repo { display: inline-flex; padding: 6px; border-radius: 6px; color: var(--ink); }
+.repo:hover { background: var(--rule); }
+.version { font: 500 14px/1 var(--mono); color: var(--graphite); font-variant-numeric: tabular-nums; }
 
 /* ---------- 로그인 ---------- */
 .login {
@@ -197,7 +201,8 @@ dialog .tools { justify-content: flex-end; }
   .layout aside { display: contents; }
   .sheet { order: 1; }
   .recent { order: 2; }
-  .topbar { padding: 10px 16px; }
+  .topbar { padding: 10px 16px; gap: 8px; }
+  .top-actions { gap: 4px; }
   .sheet { min-height: 360px; }
   .sheet-head { padding: 16px; grid-template-columns: minmax(0, 1fr); }  /* tools always under the title */
   .code .l { grid-template-columns: 40px minmax(0, 1fr); }
@@ -205,6 +210,11 @@ dialog .tools { justify-content: flex-end; }
   .state { padding: 32px 16px; }
   .state h3 { font-size: 24px; }
   .recent { margin-top: 24px; }
+}
+/* Very narrow phones: logo only, so repo · version · logout still fit on one row. */
+@media (max-width: 440px) {
+  .wordmark-text { display: none; }
+  .top-actions .btn { padding: 0 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before { animation: none !important; transition: none !important; }

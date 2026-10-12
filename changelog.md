@@ -1,7 +1,7 @@
 # Changelog
 
 EverythingMarkdown 버전별 변경 이력과 릴리즈 노트입니다. 최신 버전이 위에 옵니다.
-각 버전 섹션은 태그 주석과 GitHub Release 본문에 그대로 사용합니다. 상세 규칙: [릴리즈 정책](docs/releasing.md).
+각 버전 섹션은 태그 주석과 GitHub Release 본문에 그대로 사용합니다. 릴리즈 절차는 [README](README.md#릴리즈).
 
 ## [26.1.1] - 2026-10-12
 

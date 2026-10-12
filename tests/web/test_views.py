@@ -31,6 +31,17 @@ class ViewTests(unittest.TestCase):
             self.assertIn('src="/static/app.js"', page)
             self.assertNotIn(PASSWORD, page)
 
+    def test_topbar_shows_repo_link_then_version_then_logout(self):
+        from importlib.metadata import version
+        with Service() as service:
+            page = service.client.get("/").text
+            repo = page.index('href="https://github.com/HelloJamong/everythingmarkdown"')
+            ver = page.index(f'<span class="version" title="현재 버전">{version("everythingmarkdown")}</span>')
+            logout = page.index('action="/logout"')
+            self.assertLess(repo, ver)
+            self.assertLess(ver, logout)
+            self.assertIn('rel="noopener noreferrer"', page)
+
     def test_screen_states_keep_days(self):
         with Service(upload_ttl=3 * 86400, markdown_ttl=7 * 86400) as service:
             page = service.client.get("/").text

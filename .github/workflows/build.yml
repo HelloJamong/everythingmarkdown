@@ -1,6 +1,6 @@
 # Release: pushing a version tag (e.g. 26.1.0, no "v") builds and pushes the Docker image.
 # Pushes `latest` and the version tag from one build, then publishes the GitHub Release with
-# the changelog section as notes and docker-compose.yml + env.example attached (docs/releasing.md).
+# the changelog section as notes and docker-compose.yml + env.example attached (README > 릴리즈).
 name: build
 
 on:

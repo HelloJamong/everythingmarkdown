@@ -26,7 +26,7 @@ class Settings:
     cleanup_interval: int = 300
     log_max_bytes: int = 10 * MIB
     log_backup_count: int = 10
-    # Proposed limits (web-service-plan.md §3); not env-tunable until measured on real hardware.
+    # Proposed limits; not env-tunable until measured on real hardware.
     max_file_bytes: int = 25 * MIB
     max_request_bytes: int = 26 * MIB
     max_active_jobs: int = 3

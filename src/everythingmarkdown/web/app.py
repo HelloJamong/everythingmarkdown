@@ -4,6 +4,7 @@ import os
 import secrets
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from importlib.metadata import version
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,8 @@ from ..markitdown_adapter import SUPPORTED_EXTENSIONS
 from . import auth, logs, routes
 from .config import Settings, load_settings
 from .jobs import Jobs
+
+REPO_URL = "https://github.com/HelloJamong/everythingmarkdown"
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -67,9 +70,11 @@ def _days(seconds: int) -> str:
 
 
 def _screen(settings: Settings) -> dict[str, Any]:
-    """Limits and retention shown next to the upload box (plan §3: the screen states the policy)."""
+    """Limits and retention shown next to the upload box."""
     temp_minutes = settings.temp_result_ttl // 60
     return {
+        "version": version("everythingmarkdown"),
+        "repo_url": REPO_URL,
         "accept": ",".join(SUPPORTED_EXTENSIONS),
         "formats": ", ".join(ext[1:].upper() for ext in SUPPORTED_EXTENSIONS),
         "max_bytes": settings.max_file_bytes,

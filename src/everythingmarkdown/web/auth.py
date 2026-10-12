@@ -1,4 +1,4 @@
-"""Single-password login (web-service-plan.md §4): signed cookie, Origin check, in-memory rate limit."""
+"""Single-password login (.env APP_PASSWORD): signed cookie, Origin check, in-memory rate limit."""
 
 import hmac
 import time

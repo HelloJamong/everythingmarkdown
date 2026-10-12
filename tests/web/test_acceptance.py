@@ -1,4 +1,4 @@
-"""Web P6 gap tests for acceptance criteria not already covered (IDs from web-service-plan.md §6)."""
+"""Web P6 gap tests for acceptance criteria not already covered (IDs A01~A25 of the web acceptance criteria)."""
 
 import hashlib
 import json
