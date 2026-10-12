@@ -145,7 +145,11 @@ MARKDOWN_RETENTION_DAYS=7
 TEMP_RESULT_TTL_MINUTES=60
 CLEANUP_INTERVAL_SECONDS=300
 
-# 파일 보관과 별개인 로그 정책(제안값)
+# 저장·로그 경로(컨테이너 기본값)
+DATA_DIR=/data
+LOG_DIR=/logs
+
+# 파일 보관과 별개인 로그 정책(제안값). LOG_RETENTION_DAYS는 아직 미구현
 LOG_RETENTION_DAYS=30
 LOG_MAX_BYTES=10485760
 LOG_BACKUP_COUNT=10
@@ -207,6 +211,7 @@ services:
 - 독립 보관 설정과 파일별 만료 시각, 시작/주기 정리, 삭제 실패 재시도, 로그 회전을 구현한다. 원본/결과 Y/N 네 가지 조합을 검증한다.
 - SQLite 쓰기와 작업 전이는 웹 프로세스가 담당한다. 자식은 지정 파일 변환만 수행하고 DB/세션 처리에 관여하지 않는다.
 - 완료: 동일 파일명 연속 업로드 성공, 7개 포맷 다운로드 성공, 초과/손상/미지원 입력의 안전한 실패, 죽은 변환 프로세스 회수 후 다음 작업 성공.
+- 2026-10-12 구현 메모: 실제 파일은 `web/{jobs,routes,worker,logs}.py`. 사용자가 하나라 소유권 검사는 없다. 업로드 크기는 Content-Length 필수(없으면 411)로 파싱 전에 제한한다(uvicorn이 선언 길이 이상 본문을 전달하지 않음). `uploading` 상태는 두지 않고 업로드가 끝난 뒤 작업을 만든다. 실패·중단 작업은 원본까지 지워지면 다음 정리에서 메타데이터를 제거한다. 업로드 수신 시간 제한, 대기 만료, 자식 rlimit, 로그 날짜 회전·30일 정리·쓰기 실패 readiness, 보관 N 동시 다운로드 참조 계수는 보류(TODO 참고).
 
 ### P4 — 개인용 웹 화면
 - 신규 예정: `web/templates/{base,index}.html`, `web/static/`, `tests/web/test_views.py` 및 브라우저 검증 명세.

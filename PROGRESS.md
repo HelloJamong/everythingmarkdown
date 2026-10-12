@@ -1,8 +1,8 @@
 # EverythingMarkdown 진행 현황
 
 - 최종 정리일: 2026-10-12
-- 현재 단계: **변환 코어·웹 P1·웹 P2(인증) 완료 / 웹 P3~P6 미착수**(P4 화면 목업 작성)
-- 다음 작업: 웹 P3(업로드·변환·보관) 착수
+- 현재 단계: **변환 코어·웹 P1~P3 완료 / 웹 P4~P6 미착수**(P4 화면 목업 작성)
+- 다음 작업: 웹 P4(화면) — 목업을 템플릿으로 구현
 
 ## 프로젝트 목표
 
@@ -15,7 +15,7 @@ HTTPS는 nginx 등 리버스 프록시에서 처리한다. 설계 기준: [웹 �
 | 영역 | 상태 |
 |---|---|
 | 변환 코어 `models`·`service`·`markitdown_adapter` | 완료. 7개 포맷, 입력 검증, UTF-8/LF 저장, 네트워크 미사용 |
-| 웹 앱 `src/everythingmarkdown/web/` | 비밀번호 로그인·서명 쿠키·Origin 검사·로그인 제한·`/healthz` 완료. 업로드 화면 미착수 |
+| 웹 앱 `src/everythingmarkdown/web/` | 인증, 작업 API(업로드·상태·미리보기·다운로드·삭제), 자식 프로세스 변환, 보관·정리, JSON 로그 완료. 업로드 화면 미착수 |
 | Docker `Dockerfile`·`compose.yaml` | 미착수 |
 | CI `ci.yml` | ruff·mypy·pytest, `main` push마다 실행 |
 | 배포 `build.yml` | Docker Hub 빌드·푸시 job(수동). `Dockerfile` 전까지 실패 |
@@ -50,6 +50,14 @@ HTTPS는 nginx 등 리버스 프록시에서 처리한다. 설계 기준: [웹 �
 - `web/auth.py`·`web/app.py`: 로그인/로그아웃, 시작마다 새 키로 서명한 쿠키(로그인 후 8시간 절대 만료), 상태 변경 요청 Origin 검사, IP당 1분 5회 실패 제한, 인증 감사 이벤트 stderr 출력.
 - 업로드 화면 전까지 `/`는 로그인 확인용 임시 페이지.
 - 테스트 77개 통과(웹 16개), 실제 uvicorn 스모크 확인.
+
+## 웹 P3 완료 내용 (2026-10-12)
+
+- `web/jobs.py`: SQLite 작업 저장소(`/data/app.db`), 단일 변환 스레드가 자식 프로세스(`web/worker.py`)로 변환, 120초 초과 시 종료·회수, `.work`에서 `markdown/<id>/input.md`로 게시, 재시작 시 interrupted 처리, 보관 만료 정리.
+- `web/routes.py`: `POST/GET /api/jobs`, `GET /api/jobs/{id}`, `/preview`(64 KiB), `/download`, `DELETE`. 모두 로그인 필요.
+- `web/logs.py`: audit/access JSON Lines 파일, 크기 회전.
+- 보류한 계약은 TODO 웹 P3 "미구현으로 남긴 계약"에 기록.
+- 테스트 94개 통과(웹 33개), 실제 uvicorn에서 docx 업로드→변환→한글 파일명 다운로드→보관 N 재다운로드 410 확인.
 
 ## 남은 위험
 

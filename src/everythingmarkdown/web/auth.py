@@ -1,8 +1,6 @@
 """Single-password login (web-service-plan.md §4): signed cookie, Origin check, in-memory rate limit."""
 
 import hmac
-import json
-import logging
 import time
 from collections.abc import Awaitable, Callable
 from pathlib import Path
@@ -12,21 +10,17 @@ from fastapi import APIRouter, Form, HTTPException, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+from . import logs
+
 SESSION_MAX_AGE = 8 * 60 * 60
 UNSAFE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 
-audit = logging.getLogger("everythingmarkdown.audit")
 templates = Jinja2Templates(directory=Path(__file__).parent / "templates")
 router = APIRouter()
 
 
 def _audit(event: str, request: Request) -> None:
-    audit.info(json.dumps({"event": event, "ip": _client_ip(request)}))
-
-
-def _client_ip(request: Request) -> str:
-    # uvicorn --proxy-headers rewrites client from trusted X-Forwarded-For.
-    return request.client.host if request.client else "unknown"
+    logs.audit(event, ip=logs.client_ip(request), request_id=getattr(request.state, "request_id", None))
 
 
 class LoginLimiter:
@@ -94,7 +88,7 @@ def login_page(request: Request, expired: str | None = None) -> Response:
 
 @router.post("/login")
 def login(request: Request, password: str = Form("")) -> Response:
-    ip = _client_ip(request)
+    ip = logs.client_ip(request)
     limiter: LoginLimiter = request.app.state.limiter
     if limiter.blocked(ip):
         _audit("login_rate_limited", request)

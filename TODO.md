@@ -2,7 +2,7 @@
 
 - 최종 정리일: 2026-10-12
 - 제품: **개인용 웹 서비스**. 배포물은 Docker Hub의 통합 웹 서비스 이미지 하나다.
-- 현재 상태: 변환 코어·웹 P1·웹 P2(인증) 완료. **다음은 웹 P3**, 웹 P4~P6 미착수. P4 화면 목업은 작성됨.
+- 현재 상태: 변환 코어·웹 P1~P3 완료. **다음은 웹 P4(화면)**, 웹 P5~P6 미착수. P4 화면 목업은 작성됨.
 - 관련 문서: [진행 현황](PROGRESS.md) · [웹 서비스 설계·계획](docs/web-service-plan.md) · [릴리즈 정책](docs/releasing.md) · [P1 코어 검증](docs/p1-validation.md)
 - 2026-10-12 결정:
   - 데스크톱 GUI·CLI·P0 프로브·PyInstaller 패키징 폐기(Git 이력에 보존).
@@ -20,8 +20,8 @@
 | 변환 코어 | 완료 | 웹 P3에서 자식 프로세스로 호출 |
 | 웹 P1 구조 재정의 | 완료 | |
 | 웹 P2 인증 | 완료 | |
-| 웹 P3 업로드·변환·보관 | **다음** | SQLite 작업 저장소부터 |
-| 웹 P4 화면 | 목업 완료 | 템플릿 구현은 P3 이후 |
+| 웹 P3 업로드·변환·보관 | 완료 | 일부 계약 보류(아래) |
+| 웹 P4 화면 | **다음**(목업 완료) | 목업을 템플릿으로 구현 |
 | 웹 P5 Docker | 미착수 | `Dockerfile` 작성 후 Docker Hub 첫 푸시 |
 | 웹 P6 통합 검증·운영 문서 | 미착수 | |
 | 릴리즈 | 사용자 배포 요청 대기 | |
@@ -48,14 +48,20 @@
 - [x] `web/{app,config,auth}.py`: `APP_PASSWORD` 검증(누락·예제·12자 미만 시작 거부), 로그인/로그아웃, 시작 시 랜덤 키 서명 쿠키(8시간), Origin 검사, IP당 5회/분 로그인 제한.
 - [x] Secure 쿠키는 기본 켜고 LAN 직접 테스트용 `COOKIE_SECURE=false`만 허용(2026-10-12 결정).
 - [x] `tests/web/test_auth.py` 16개 테스트, 실제 uvicorn 스모크(healthz·리다이렉트·401·403·303·쿠키 플래그) 확인.
-- [x] 인증 감사 이벤트(`login_succeeded`·`login_failed`·`login_rate_limited`·`origin_rejected`·`logout`)를 JSON으로 stderr 출력. `/logs` 파일 기록·회전·access 로그는 웹 P3.
+- [x] 인증 감사 이벤트(`login_succeeded`·`login_failed`·`login_rate_limited`·`origin_rejected`·`logout`)를 JSON으로 기록(웹 P3부터 `/logs/audit.log`).
 
-## 웹 P3 — 업로드·변환·저장 수명주기
+## 웹 P3 — 업로드·변환·저장 수명주기 (완료)
 
-- [ ] `web/{routes,jobs,worker,cleanup,audit,store}.py`: SQLite 작업 저장소, 작업별 경로 검사, 제한된 대기열, 자식 프로세스 변환·timeout 종료, 재시작 시 interrupted 처리.
-- [ ] 원본/Markdown 독립 보관 Y/N·일수, 시작/5분 주기 정리, 삭제 실패 재시도, 로그 회전.
-- [ ] `/logs/{access,audit}.log` JSON Lines 파일 기록·회전(P2 인증 이벤트 포함).
-- [ ] `tests/web/test_{jobs,upload_limits,retention,logging}.py`.
+- [x] `web/{routes,jobs,worker}.py`: SQLite 작업 저장소, 서버 생성 작업 ID별 경로, 활성 3개 대기열(429), 자식 프로세스 변환·120초 timeout 종료, 재시작 시 interrupted 처리·`.work` 정리. 업로드는 Content-Length 필수(411)·요청 26 MiB/파일 25 MiB(413)·미지원 형식(415).
+- [x] 원본/Markdown 독립 보관 Y/N·일수(작업별 스냅샷), 보관 N 원본은 변환 종료 후·결과는 첫 전송 완료 후 또는 60분 뒤 삭제, 시작/5분 주기 정리, 삭제 실패 시 다음 주기 재시도.
+- [x] `web/logs.py`: `/logs/{access,audit}.log` JSON Lines, 크기 기준 회전(10 MiB × 10개). 파일명·본문·비밀번호 미기록, access는 경로 템플릿만 기록. 로그 디렉터리 쓰기 불가 시 시작 거부.
+- [x] `tests/web/test_jobs.py` 17개 테스트(7개 포맷·동명·경로 탈출·손상·timeout·한도·Y/N 4조합·만료·삭제·재시작·로그), 실제 uvicorn 업로드→변환→다운로드 스모크 확인.
+- [ ] 미구현으로 남긴 계약(필요 시 착수):
+  - 업로드 수신 시간 120초 제한 — 웹 P5 nginx `client_body_timeout`으로 대체 검토.
+  - 대기 만료 5분 — 활성 3개 × 변환 120초로 대기 상한이 이미 정해져 있어 보류.
+  - 자식 프로세스 자원 제한(rlimit) — 웹 P5 컨테이너 CPU·메모리·PID 한도로 대체 검토.
+  - 로그 날짜 경계 회전·회전 파일 30일 정리(`LOG_RETENTION_DAYS`), 로그 쓰기 실패 시 readiness 실패·접수 중단.
+  - 보관 N 결과의 동시 다운로드 참조 계수(두 번째 동시 전송이 삭제와 경합할 수 있음).
 
 ## 웹 P4 — 개인용 웹 화면
 

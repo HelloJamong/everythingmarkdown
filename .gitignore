@@ -27,3 +27,7 @@ convert_result/
 Thumbs.db
 .idea/
 .vscode/
+
+# Local web service data and logs (README dev run)
+/data/
+/logs/
