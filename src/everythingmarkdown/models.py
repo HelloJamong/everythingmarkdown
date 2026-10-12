@@ -1,4 +1,4 @@
-"""Shared request/result and safe, stable errors for GUI and CLI callers."""
+"""Shared request/result and safe, stable errors for conversion callers."""
 
 from dataclasses import dataclass
 from enum import StrEnum

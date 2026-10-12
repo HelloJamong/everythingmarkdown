@@ -1,133 +1,62 @@
 # EverythingMarkdown 진행 현황
 
 - 최종 정리일: 2026-10-12
-- 현재 단계: **P0~P3 완료 / P4 진행 중(설정·문서·빌드 초안 완료, OS/CI 배포물 빌드 남음) / 웹 서비스 전환은 계획 완료·구현 미착수 / 목표 OS 실환경 테스트는 배포 후 이관**
-- 다음 작업: 웹 P1(웹 계약 확정·기존 동작 고정) 착수, Windows/macOS 러너에서 배포물 빌드·서명, (배포 요청 시) 릴리즈 게시
+- 현재 단계: **변환 코어 완료 / 웹 P1(구조 재정의) 진행 중 / 웹 P2~P6 미착수**
+- 다음 작업: 동명 파일 회귀 테스트, 웹 P2(인증) 착수
 
 ## 프로젝트 목표
 
-Microsoft MarkItDown을 사용해 Windows/macOS에서 GUI와 CLI로 로컬 파일을 Markdown으로
-변환한다. 원래 파일명에서 확장자만 `.md`로 바꾸고 시작 CWD의 `convert_result`에 저장한다.
-실제 출력 저장은 P1 공통 API, 제품용 CLI는 P2, 제품용 GUI는 P3으로 구현했다. P4 패키징은 진행 중이다.
+Microsoft MarkItDown으로 업로드한 문서를 Markdown으로 변환하는 **개인용 웹 서비스**를 만든다.
+본인만 로그인해 파일을 올리고 결과를 확인·복사·다운로드한다. 배포물은 Docker Hub의 통합 웹 서비스 이미지 하나이며,
+HTTPS는 nginx 등 리버스 프록시에서 처리한다. 설계 기준: [웹 서비스 설계·계획](docs/web-service-plan.md).
 
-## 완료한 준비 작업
+## 현재 구성
 
-- 원 요청을 요구사항 R1~R7로 정리.
-- Python/Tkinter 및 CLI 공통 구조, 저장·오류·배포 정책 설계.
-- A01~A26 수용 기준과 테스트 명세 작성.
-- Architect 1차 보완 후 2차 APPROVE, Critic APPROVE 기록 확보.
-- 기존 상세 계획은 로컬 `.omx/plans/`에 보존. Git 공유용 설계·검증 명세는 `docs/`에 복사.
-
-## 이번 P0 작업
-
-| 항목 | 결과 |
+| 영역 | 상태 |
 |---|---|
-| 기본 문서 | README, MIT LICENSE, `.gitignore` 작성; `.omx/`·`.omc/` 제외 |
-| 프로젝트 환경 | Python 3.12.13, `pyproject.toml`, `.venv`, `uv.lock` |
-| 의존성 | MarkItDown 0.1.7 + pdf/docx/pptx/xlsx extras, PyInstaller 6.22.2 |
-| 시험 코드 | 명시 컨버터 하나만 등록하는 프로브, CLI 파일/대화형 입력, 최소 Tk 환경 창 |
-| 샘플 | 자체 생성 PDF/DOCX/PPTX/XLSX/HTML/CSV/TXT 및 재생성 스크립트 |
-| 소스 검증 | 7개 포맷 변환, 테스트 15개 통과 |
-| Linux 시험 빌드 | CLI/GUI onedir 생성, 동결 CLI의 7개 포맷 변환 성공 |
-| 네트워크 | Python socket 시도 감시 및 Linux 네트워크 namespace 격리 재검증 |
-| GUI | Tcl/Tk 번들 누락 보완; 디스플레이 부재로 실제 창 표시는 미검증 |
-| 목표 플랫폼 | Windows/macOS 환경 없음; 빌드·실행 검증 미실행 |
+| 변환 코어 `models`·`service`·`markitdown_adapter` | 완료. 7개 포맷, 입력 검증, UTF-8/LF 저장, 네트워크 미사용 |
+| 웹 앱 `src/everythingmarkdown/web/` | 미착수 |
+| Docker `Dockerfile`·`compose.yaml` | 미착수 |
+| CI `ci.yml` | ruff·mypy·pytest, `main` push마다 실행 |
+| 배포 `build.yml` | Docker Hub 빌드·푸시 job(수동). `Dockerfile` 전까지 실패 |
+| Docker Hub | 공개 저장소, `linux/amd64` 단일 이미지. 시크릿 `DOCKERHUB_USERNAME`·`DOCKERHUB_TOKEN` 등록 확인 |
 
-명령·버전·로그·제약은 [P0 검증 기록](docs/p0-validation.md)에 정리했다.
-P0 프로브는 변환 성공 여부와 문자 수만 보고하며 **문서 본문이나 결과 파일을 출력하지 않는다.**
+## 이력 요약
 
-## 이번 P1 작업
+| 기간 | 내용 |
+|---|---|
+| 2026-09-08 | 요구사항 정리, P0 기술 검증, 변환 코어(P1) 구현. 근거: [P1 검증 기록](docs/p1-validation.md) |
+| 2026-09-08~09 | 데스크톱 CLI·Tkinter GUI·PyInstaller 패키징 초안 구현(126개 테스트 통과) |
+| 2026-09-11 | 개인용 웹 서비스 전환 계획 작성 |
+| 2026-10-12 | Docker Hub 시크릿 등록, `build.yml`에 Docker job 추가. MIT 저작권자를 HelloJamong으로 지정 |
+| 2026-10-12 | **웹 서비스 중심으로 재정의.** 데스크톱 GUI·CLI·패키징 폐기 승인, 웹 의존성 기본 의존성 승인, 릴리즈를 Docker 이미지로 전환. HTTPS는 리버스 프록시 담당 |
 
-- `models.py`: 불변 요청/결과 모델, 공통 오류 코드·안전한 메시지·종료 코드.
-- `service.py`: 시작 CWD 기준 경로, 입력·크기·ZIP/OOXML 검증, UTF-8/LF 저장, 배타적 생성과 기존 파일 보호.
-- `markitdown_adapter.py`: 요청별 명시 컨버터 하나 등록, 기본 컨버터·플러그인 비활성, 외부 예외 정규화.
-- 쓰기·닫기 실패 시 생성한 미완성 결과만 정리; 파일 교체/정리 실패 시 삭제하지 않고 경고.
-- P1 신규 테스트 59개와 기존 P0 15개를 합쳐 74개 통과. 실제 엔진 7포맷 저장·외부 참조 HTML과 네트워크 격리 검증 포함.
-- 버전 정책 수정: 미배포 changelog 항목 제거. 사용자 배포 요청 전 버전 기록 없음, 첫 배포는 `26.1.0`.
-- P0 프로브는 역사적 시험 도구로 유지한다. 제품 코어에서 P0 코드에 의존하지 않는다.
-- 실행 근거: [P1 검증 기록](docs/p1-validation.md).
+데스크톱 앱 코드와 설계·검증 문서는 Git 이력(`f4cb598` 이전)에 남아 있다.
 
-## 이번 P2 작업
+## 웹 P1 진행 내용 (2026-10-12)
 
-- `cli.py`/`__main__.py` 및 `everythingmarkdown` 콘솔 진입점 추가. P1 공통 서비스로 실제 변환·저장.
-- 파일 인자·TTY 대화형 입력·도움말·개발 상태 표시, stdout/stderr 분리와 종료 코드 0/2/3/4/130.
-- Ctrl+C/EOF/빈 입력, 따옴표·한글/공백 경로, 오류·잔여 파일 경고와 원문 미노출 처리.
-- P2 신규 29개 + 기존 74개 = 전체 103개 테스트 통과. 실제 subprocess와 Linux PTY 검증 포함.
-- 의존성 추가·버전 증가·릴리즈 항목·태그 없음. 첫 배포 요청 시 `26.1.0` 정책 유지.
-- 실행 근거: [P2 검증 기록](docs/p2-validation.md).
+- README·릴리즈 정책·웹 계획·TODO·PROGRESS를 웹 서비스 기준으로 재작성.
+- `pyproject.toml`: CLI/GUI 진입점, PyInstaller `build` 그룹, 로고 패키지 데이터 제거. `uv.lock` 갱신.
+- `build.yml`: Windows/macOS 빌드 job 제거, Docker job만 유지.
+- 통합 테스트의 GUI/CLI 결과 일치 테스트 제거.
+- 데스크톱 GUI·CLI·P0 프로브·패키징 코드와 관련 테스트·설계·검증 문서 삭제.
+- 남음: 동명 파일 회귀 테스트.
 
-## 이번 P3 작업 (2026-09-09)
+## 남은 위험
 
-- `DESIGN.md`: design.md §6 GUI 계약을 구현 스펙으로 구체화. 시각 목업 `docs/gui-mockup.html`.
-- `gui.py`: Tk 비의존 `ConversionController`(상태 기계·워커·큐) + `_TkView`(유일한 Tk 코드).
-  단일 작업 스레드 + `queue.Queue` + `after()` 폴링, 워커는 큐만 접근.
-- `everythingmarkdown-gui` 진입점 추가(P0 프로브와 분리). `assets/logo.ico` → `logo.png` 창 아이콘.
-- `test_gui.py` 16개(헤드리스) + A02 GUI/CLI 결과 일치 통합 테스트. 실제 창/키보드/배율은 배포 후로 이관.
-
-## 이번 P4 작업 — 진행 중 (2026-09-09)
-
-- lint=`ruff`, typecheck=`mypy` 채택. `pyproject.toml` 설정 + `dev` 그룹. `ruff check`·`mypy` 통과.
-- 전체 테스트 126개 통과(unittest subTest 포함). 텍스트 없는 PDF 회귀(A13) 추가.
-- `packaging/emarkdown.spec`(GUI+CLI 단일 배포 폴더, macOS `BUNDLE`), `build_release.py`(zip), `scripts/sha256sums.py`.
-- `.github/workflows/ci.yml`(lint+mypy+test), `build.yml`(Windows/macOS 빌드 초안, 수동 트리거).
-- [docs/acceptance-matrix.md](docs/acceptance-matrix.md) A01~A26 매핑, [docs/third-party-licenses.md](docs/third-party-licenses.md) 초안.
-- **2026-09-09 결정:** Windows도 설치기 없이 ZIP 배포. `docs/releasing.md`·README 개정.
-- 남음(OS/CI 필요): 실제 `.exe`/`.app` 빌드, 서명·공증, 라이선스 원문 포함, 암호화 PDF fixture.
-
-## 웹 서비스 전환 계획 (2026-09-11)
-
-- [웹 서비스 전환 계획](docs/web-service-plan.md) 작성: 개인 도메인 HTTPS에서 단일 소유자가 로그인해 업로드·Markdown 다운로드하는 Docker 서비스.
-- FastAPI 단일 프로세스 + SQLite + 제한된 변환 자식 프로세스, 기존 `ConversionService` 재사용. 원본/Markdown 독립 보관 정책, `./logs` 마운트 access/audit 로그.
-- 구현 단계 웹 P1~P6과 수용 기준 웹 A01~A25 정의. **코드·의존성·Docker 파일은 아직 없다**(2026-10-12 확인).
-
-## Docker Hub 배포 준비 (2026-10-12)
-
-- `DOCKERHUB_USERNAME`·`DOCKERHUB_TOKEN` Actions 시크릿 등록 확인.
-- `build.yml`에 `docker` job 추가(`8edfd65`): `<USERNAME>/everythingmarkdown`을 `latest`·`pyproject` 버전 태그로 푸시.
-- `Dockerfile`은 웹 P5에서 작성하므로 그 전까지 job은 실패한다. `build` 워크플로는 아직 한 번도 실행하지 않았다.
-
-## 현재 검증 상태 (2026-10-12)
-
-- `uv run --locked --group dev pytest -q` 126개 통과, `ruff check .`·`mypy` 통과.
-- GitHub `ci` 워크플로 최근 3회 성공(`1ccded7`에서 tkinter 없는 러너 실패 수정).
-
-## 아직 완료하지 않은 것
-
-- **배포 후로 이관:** Windows/macOS의 Python 미설치 환경에서 GUI/CLI 및 7개 포맷 검증. 현재 개발 선행 조건이 아님.
-- Finder/Explorer/터미널 시작 CWD와 쓰기 권한의 플랫폼별 확인.
-- 목표 환경 전체에서 의존성·패키저 최종 호환성 확정.
-- Windows/macOS 러너에서 실제 배포물 빌드, 코드서명·공증, 제3자 라이선스 원문 포함, 외부 릴리스.
-- 암호화 PDF fixture(A12) — pypdf/pikepdf 도입 여부 결정 대기.
-- 서드파티 패키지별 LICENSE 원문 미포함(자체 `LICENSE`와 라이선스 목록 문서는 배포물에 포함 완료).
-- 웹 서비스 웹 P1~P6 전체 구현, `Dockerfile` 작성 후 Docker Hub 첫 푸시 검증.
-
-**P0 테스트 15개 통과는 A01~A26 전체 수용 기준 통과나 Windows/macOS 지원 완료가 아니다.**
-P0 검증 당시에는 Git 작업을 수행하지 않았다. 이후 사용자 요청으로 `main` 브랜치를 초기화하고
-[HelloJamong/everythingmarkdown](https://github.com/HelloJamong/everythingmarkdown) 비공개 저장소를
-생성해 `origin`으로 연결했다. `.omx/`·`.omc/`와 빌드/가상환경은 추적에서 제외한다.
-
-## 남은 계획과 위험
-
-1. 사용자 요청에 따라 실환경 테스트를 배포 후 별도 단계로 이관했다. 로컬 자동 테스트와 배포 파일 빌드는 유지한다.
-2. [TODO](TODO.md)의 P4를 진행한다. Windows/macOS 모두 ZIP(폴더 / `.app`)을 생성하는 것이 배포 목표다. 설치기는 만들지 않는다.
-3. 7개 포맷·100 MiB·Windows 11 x64/macOS 14+ Apple Silicon은 현재 시험 대상 제안값이다.
-4. OCR·레이아웃 완전 재현·악성 문서 샌드박스·하드 타임아웃은 보장하지 않는다.
-5. 상태가 바뀌면 실제 실행 증거가 있는 항목만 완료로 표시한다.
+- 실제 도메인·nginx 위치·호스트 자원이 미확인이다. 웹 P5 전까지 정한다.
+- Docker Hub 저장소가 공개라 이미지 내용은 누구나 볼 수 있다. 비밀·데이터가 이미지에 들어가지 않게 검사한다.
+- 인증을 붙여도 업로드 문서가 안전해지는 것은 아니다. 크기·압축·시간·프로세스 한도로 완화하며 강한 격리는 보장하지 않는다.
+- 100 MiB 제한과 동시 변환 1개는 초기 제안값이다. 실제 서버에서 측정 후 조정한다.
 
 ## 공유 문서
 
-- [릴리즈 정책](docs/releasing.md): 최종 Windows/macOS 배포 요구와 버전·태그·노트 계약 (구현 전 정의)
-- [changelog](changelog.md): 배포 시 작성할 릴리즈 노트. 현재 버전 항목 없음; 첫 배포는 `26.1.0`
-- [README](README.md): 설치·CLI/GUI 사용·빌드 방법
-- [웹 서비스 전환 계획](docs/web-service-plan.md): 개인용 웹 서비스 구조·보관·로그·단계·수용 기준
-- [TODO](TODO.md): 단계별 실행 체크리스트
-- [설계 기준선](docs/design.md): 원 요구사항과 세부 동작 계약
-- [GUI 설계](DESIGN.md): P3 GUI 구현 스펙 · [시각 목업](docs/gui-mockup.html)
-- [검증 명세](docs/test-spec.md): A01~A26 수용 기준 · [현황 매트릭스](docs/acceptance-matrix.md)
-- [서드파티 라이선스](docs/third-party-licenses.md): 번들 의존성 라이선스 초안
-- [P0 검증 기록](docs/p0-validation.md): 초기 프로브 실행과 미검증 경계
-- [P1 검증 기록](docs/p1-validation.md): 공통 코어·파일 안전성·실제 변환 검증
-- [P2 검증 기록](docs/p2-validation.md): CLI 단위·프로세스·대화형 실행 검증
+- [README](README.md): 서비스 개요·구성·개발 환경
+- [TODO](TODO.md): 단계별 체크리스트
+- [웹 서비스 설계·계획](docs/web-service-plan.md): 구조·인증·보관·로그·단계·수용 기준
+- [릴리즈 정책](docs/releasing.md): Docker 이미지 배포, 버전·태그·노트 규칙
+- [changelog](changelog.md): 배포 시 작성할 릴리즈 노트. 첫 배포는 `26.1.0`
+- [P1 검증 기록](docs/p1-validation.md): 변환 코어 검증
+- [서드파티 라이선스](docs/third-party-licenses.md): 의존성 라이선스 초안
 
-원본 대화·Architect/Critic 검토·산출물 해시 기록은 로컬 `.omx/`에만 보관한다.
-이전 RTK 환경 작업은 앱 구현과 별개이며 이번에 재검사하지 않았다.
+원본 대화와 검토 기록은 로컬 `.omx/`에만 보관한다.
