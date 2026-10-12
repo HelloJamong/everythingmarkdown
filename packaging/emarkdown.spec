@@ -23,6 +23,8 @@ SRC = ROOT / "src"
 # markitdown reads its own distribution metadata at import time; magika ships model data.
 datas = copy_metadata("markitdown") + collect_data_files("magika")
 datas += [(str(SRC / "everythingmarkdown" / "logo.png"), "everythingmarkdown")]
+# Own MIT license and the third-party license list ship with every distribution.
+datas += [(str(ROOT / "LICENSE"), "."), (str(ROOT / "docs" / "third-party-licenses.md"), ".")]
 
 gui_a = Analysis([str(ROOT / "packaging" / "emarkdown_gui.py")], pathex=[str(SRC)], datas=datas)
 cli_a = Analysis([str(ROOT / "packaging" / "emarkdown_cli.py")], pathex=[str(SRC)], datas=datas)

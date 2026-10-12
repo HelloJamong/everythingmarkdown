@@ -21,7 +21,8 @@
 - HTTP 접근, 인증, 파일/변환 작업, 자동 정리와 운영 이벤트를 로그에 기록한다. 호스트 `./logs`를 컨테이너 `/logs`에 마운트한다.
 - 회원가입, 사용자·역할 관리 화면, 장기 자동 로그인, 이메일 비밀번호 복구, 공유 링크, OCR, URL 변환, 일괄 변환, 공개 API, 다중 서버는 MVP 밖이다.
 - 앞선 대화의 앞단 인증은 가능한 대안으로 남긴다. 이번 기본안은 참고 프로젝트처럼 **앱 자체 단일 계정 로그인**이다. 앞단 인증으로 이미 운영 중이라면 구현 시작 전 인증 단계만 교체한다. 두 인증 시스템을 동시에 새로 만들지 않는다.
-- 실제 도메인, 기존 프록시 종류/위치, 호스트 CPU·메모리·아키텍처는 미확인이다. 계획에는 자리표시자만 쓰며 실제 DNS·서버 변경은 포함하지 않는다.
+- 2026-10-12 결정: 앱은 HTTPS/TLS를 자체 구현하지 않고 HTTP만 제공한다. HTTPS는 추후 nginx 등 리버스 프록시에서 종료한다. 앱·이미지에 인증서 처리나 HTTP→HTTPS 리다이렉트를 넣지 않는다.
+- 실제 도메인, 프록시 위치(같은 Docker 네트워크/호스트/다른 서버), 호스트 CPU·메모리·아키텍처는 미확인이다. 계획에는 자리표시자만 쓰며 실제 DNS·서버 변경은 포함하지 않는다.
 
 ## 2. 저장소 근거와 적용 판단
 
@@ -112,7 +113,7 @@ logs/
 - 쿠키는 서비스 전용 이름, host-only, Secure, HttpOnly, SameSite=Lax로 설정한다. 로그인·업로드·삭제·로그아웃의 CSRF 토큰과 Origin 검증을 수행한다.
 - 로그인 실패는 계정·신뢰 가능한 클라이언트 주소 기준으로 제한한다(제안: 각 5회/분, 이후 429). 영구 계정 잠금은 두지 않는다. 비밀번호 길이 상한과 bcrypt 입력 처리 경계는 선택 버전 문서/테스트로 고정하며 조용한 잘림은 금지한다.
 - 세션 쿠키는 암호화 저장소가 아니라 서명된 데이터이다. 문서/비밀번호를 넣지 않는다. 근거: [Starlette SessionMiddleware](https://starlette.dev/middleware/#sessionmiddleware).
-- HTTPS는 프록시에서 종료한다. 같은 Docker 네트워크의 프록시라면 앱 포트를 publish하지 않고, 호스트 프록시라면 loopback에만 bind한다. 다른 서버 프록시라면 방화벽/사설망 규칙을 별도 확정한다.
+- HTTPS는 프록시(nginx 등)에서 종료하고 앱은 HTTP만 수신한다. 프록시는 `X-Forwarded-Proto`·`X-Forwarded-For`·`Host`를 전달하고, 앱은 신뢰한 프록시의 헤더로만 원래 스킴을 판단한다. 같은 Docker 네트워크의 프록시라면 앱 포트를 publish하지 않고, 호스트 프록시라면 loopback에만 bind한다. 다른 서버 프록시라면 방화벽/사설망 규칙을 별도 확정한다.
 - `FORWARDED_ALLOW_IPS`와 허용 Host는 실제 배포 경로만 신뢰한다. Jukebox의 IP 목록을 복사하지 않는다(E13). 근거: [FastAPI Behind a Proxy](https://fastapi.tiangolo.com/advanced/behind-a-proxy/).
 - 비루트 실행, 불필요한 capability 제거, no-new-privileges, 루트 파일시스템 읽기 전용, 필요한 데이터/임시 경로만 쓰기 허용, CPU·메모리·PID·저장소 한도를 구성한다. 예시 자원값은 시험 후 확정한다.
 - 변환 자식 프로세스에는 세션 키/비밀번호 환경을 전달하지 않는다. Linux 프로세스 자원 제한과 timeout 후 종료·회수까지 검증한다. 같은 컨테이너의 자식 프로세스는 완전한 보안 샌드박스가 아니다. 악성 문서 처리·다중 사용자 공개 서비스로 확대하면 별도 워커 격리/네트워크 정책을 추가해야 한다.
@@ -209,9 +210,9 @@ services:
 
 ### P5 — Docker 및 도메인 배포 구성
 - 신규 예정: `Dockerfile`, `compose.yaml`, `.dockerignore`, `.env.example`, `docs/web-deployment.md`.
-- Python 3.12 기반 이미지, 잠긴 의존성 설치, 비루트·자원 한도·healthcheck·데이터 볼륨·`./logs:/logs` 바인드 마운트·`.env` 최초 비밀번호/보관 설정·세션 secret 파일 주입·프록시 연결 예시를 만든다(E5, E13).
+- Python 3.12 기반 이미지, 잠긴 의존성 설치, 비루트·자원 한도·healthcheck·데이터 볼륨·`./logs:/logs` 바인드 마운트·`.env` 최초 비밀번호/보관 설정·세션 secret 파일 주입·nginx 리버스 프록시 연결 예시(문서 수준, TLS 설정은 프록시 측)를 만든다(E5, E13). 이미지에는 TLS·인증서를 포함하지 않는다.
 - 컨테이너에서 Tk/디스플레이 없이 웹 서버가 실행되고 설치된 패키지에 템플릿/정적 자산이 포함되는지 검사한다.
-- 완료: 새 이미지 build/up/health 성공, 재시작 후 계정과 완료 결과 유지, 미완료 작업 interrupted 처리, 외부 앱 포트 접근 불가, HTTPS 쿠키와 리다이렉트 정상.
+- 완료: 새 이미지 build/up/health 성공, 재시작 후 계정과 완료 결과 유지, 미완료 작업 interrupted 처리, 외부 앱 포트 접근 불가, 프록시 경유 시 Secure 쿠키·리다이렉트 정상(HTTPS 종료는 프록시 몫).
 
 ### P6 — 통합 검증과 운영 문서
 - 대상: `tests/web/`, `tests/integration/`, `docs/web-deployment.md`, `README.md`, 필요 시 `.github/workflows/`의 Docker 검사 전용 작업.

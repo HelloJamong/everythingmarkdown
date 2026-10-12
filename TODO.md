@@ -152,7 +152,8 @@ Windows `.exe`·macOS `.app` 실제 빌드와 서명은 각 OS 또는 CI에서 �
 - [ ] 각 패키지 LICENSE/NOTICE 원문을 배포물에 포함.
 - [ ] (배포 요청 시) 버전/메타데이터/파일명 일치, changelog 추출·태그 동일성 검증.
 - [ ] 암호화 PDF fixture — pypdf/pikepdf 도입 여부 결정 후 A12 보강.
-- [ ] `packaging/emarkdown.spec`에 LICENSE/NOTICE 포함 설정 추가(현재 spec에 라이선스 파일 항목 없음).
+- [x] 자체 `LICENSE`(MIT, 저작권자 HelloJamong)와 `docs/third-party-licenses.md`를 spec `datas`로 배포물에 포함. Linux 시험 빌드에서 `EverythingMarkdown/_internal/`에 포함 확인(2026-10-12).
+- [ ] 서드파티 패키지별 LICENSE 원문 포함: `copy_metadata(recursive=True)`는 extras 의존성(pdf/docx/pptx/xlsx)을 따라가지 않고, markitdown·magika·onnxruntime·flatbuffers는 dist-info에 라이선스 파일이 없어 별도 수집 필요.
 
 ### Docker Hub 이미지 배포 (2026-10-12)
 
@@ -166,7 +167,7 @@ Windows `.exe`·macOS `.app` 실제 빌드와 서명은 각 OS 또는 CI에서 �
 
 ## 개인용 웹 서비스 전환 — 계획 완료, 구현 미착수
 
-상세 계약·수용 기준(웹 A01~A25): [웹 서비스 전환 계획](docs/web-service-plan.md). 아래 단계명은 로컬 앱 P0~P4와 구분해 `웹 P*`로 표기한다.
+상세 계약·수용 기준(웹 A01~A25): [웹 서비스 전환 계획](docs/web-service-plan.md). HTTPS는 자체 구현하지 않고 추후 nginx 등 리버스 프록시에서 처리한다(2026-10-12 결정). 아래 단계명은 로컬 앱 P0~P4와 구분해 `웹 P*`로 표기한다.
 2026-10-12 확인: `src/everythingmarkdown/web/`, 웹 의존성, `tests/web/`, `Dockerfile`·`compose.yaml` 모두 없음.
 
 ### 웹 P1 — 웹 계약 확정 및 기존 동작 고정
@@ -189,13 +190,13 @@ Windows `.exe`·macOS `.app` 실제 빌드와 서명은 각 OS 또는 CI에서 �
 
 ### 웹 P5 — Docker 및 도메인 배포 구성
 - [ ] `Dockerfile`(Python 3.12, 잠긴 의존성, 비루트, healthcheck), `compose.yaml`(`./data:/data`, `./logs:/logs`), `.dockerignore`, `.env.example`.
-- [ ] `docs/web-deployment.md`: 프록시 연결·HTTPS·secret 주입.
+- [ ] `docs/web-deployment.md`: nginx 리버스 프록시 연결 예시(HTTPS는 프록시에서 종료, 앱은 HTTP만 제공)·forwarded 헤더 신뢰 범위·secret 주입.
 - [ ] 이미지 build/up/health, 재시작 후 데이터 유지 검증.
 
 ### 웹 P6 — 통합 검증과 운영 문서
 - [ ] 웹 A01~A25 수용 기준 검증 및 lint/typecheck/회귀/컨테이너 smoke 기록.
 - [ ] DB 백업/복원, 이미지 rollback 절차 문서화.
-- [ ] 실제 도메인·프록시 종류/위치·호스트 자원 확인(현재 미확인).
+- [ ] 실제 도메인·nginx 위치(같은 Docker 네트워크/호스트/다른 서버)·호스트 자원 확인(현재 미확인).
 
 ## 최초 릴리즈 게시 — 사용자 배포 요청 후에만
 

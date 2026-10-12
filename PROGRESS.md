@@ -98,7 +98,7 @@ P0 프로브는 변환 성공 여부와 문자 수만 보고하며 **문서 본�
 - 목표 환경 전체에서 의존성·패키저 최종 호환성 확정.
 - Windows/macOS 러너에서 실제 배포물 빌드, 코드서명·공증, 제3자 라이선스 원문 포함, 외부 릴리스.
 - 암호화 PDF fixture(A12) — pypdf/pikepdf 도입 여부 결정 대기.
-- `packaging/emarkdown.spec`에 LICENSE/NOTICE 포함 설정 없음.
+- 서드파티 패키지별 LICENSE 원문 미포함(자체 `LICENSE`와 라이선스 목록 문서는 배포물에 포함 완료).
 - 웹 서비스 웹 P1~P6 전체 구현, `Dockerfile` 작성 후 Docker Hub 첫 푸시 검증.
 
 **P0 테스트 15개 통과는 A01~A26 전체 수용 기준 통과나 Windows/macOS 지원 완료가 아니다.**
