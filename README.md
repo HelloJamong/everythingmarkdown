@@ -28,7 +28,7 @@ Docker 이미지 하나로 배포하며, 본인만 로그인해 파일을 올리
 | 경로 | 내용 | 상태 |
 |---|---|---|
 | `src/everythingmarkdown/{models,service,markitdown_adapter}.py` | 변환 코어: 입력 검증, MarkItDown 호출, UTF-8/LF 저장 | 구현 완료 |
-| `src/everythingmarkdown/web/` | 웹 앱 (FastAPI) | 미착수 |
+| `src/everythingmarkdown/web/` | 웹 앱 (FastAPI) | 인증 완료, 업로드·변환 미착수 |
 | `Dockerfile`, `compose.yaml` | 통합 웹 서비스 이미지·실행 구성 | 미착수 |
 | `.github/workflows/build.yml` | Docker Hub 이미지 빌드·푸시 (수동 실행) | 초안 |
 
@@ -41,6 +41,10 @@ uv sync --locked --group dev
 uv run --locked --group dev pytest -q      # 전체 테스트
 uv run --locked --group dev ruff check .    # lint
 uv run --locked --group dev mypy            # 타입체크 (src)
+
+# 로컬 실행 (프록시 없이 http로 접속할 때만 COOKIE_SECURE=false)
+APP_PASSWORD='12자 이상 비밀번호' COOKIE_SECURE=false \
+  uv run --locked uvicorn --factory everythingmarkdown.web.app:create_app --port 8000
 ```
 
 ## 변환 코어 사용 예

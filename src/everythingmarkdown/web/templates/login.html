@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>로그인 · EverythingMarkdown</title>
+  <style>
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px;
+           box-sizing: border-box; background: #F3F4F1; color: #1D2433; font: 16px/1.6 system-ui, sans-serif; }
+    form { width: 100%; max-width: 360px; display: grid; gap: 12px; }
+    h1 { margin: 0 0 8px; font-size: 24px; }
+    input, button { font: inherit; padding: 10px 12px; border-radius: 6px; }
+    input { border: 1px solid #D5D8DE; background: #FFFFFF; }
+    button { border: 0; background: #1D2433; color: #FFFFFF; cursor: pointer; }
+    .msg { margin: 0; padding: 8px 12px; border-radius: 6px; background: #FBF3B4; }
+  </style>
+</head>
+<body>
+  <form method="post" action="/login">
+    <h1>EverythingMarkdown</h1>
+    {% if error %}<p class="msg" role="alert">{{ error }}</p>{% endif %}
+    {% if notice %}<p class="msg">{{ notice }}</p>{% endif %}
+    <label for="password">비밀번호</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required autofocus>
+    <button type="submit">로그인</button>
+  </form>
+</body>
+</html>

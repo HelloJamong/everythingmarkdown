@@ -1,8 +1,8 @@
 # EverythingMarkdown 진행 현황
 
 - 최종 정리일: 2026-10-12
-- 현재 단계: **변환 코어·웹 P1(구조 재정의) 완료 / 웹 P2~P6 미착수**(P4 화면 목업 작성)
-- 다음 작업: 웹 P2(인증) 착수
+- 현재 단계: **변환 코어·웹 P1·웹 P2(인증) 완료 / 웹 P3~P6 미착수**(P4 화면 목업 작성)
+- 다음 작업: 웹 P3(업로드·변환·보관) 착수
 
 ## 프로젝트 목표
 
@@ -15,7 +15,7 @@ HTTPS는 nginx 등 리버스 프록시에서 처리한다. 설계 기준: [웹 �
 | 영역 | 상태 |
 |---|---|
 | 변환 코어 `models`·`service`·`markitdown_adapter` | 완료. 7개 포맷, 입력 검증, UTF-8/LF 저장, 네트워크 미사용 |
-| 웹 앱 `src/everythingmarkdown/web/` | 미착수 |
+| 웹 앱 `src/everythingmarkdown/web/` | 비밀번호 로그인·서명 쿠키·Origin 검사·로그인 제한·`/healthz` 완료. 업로드 화면 미착수 |
 | Docker `Dockerfile`·`compose.yaml` | 미착수 |
 | CI `ci.yml` | ruff·mypy·pytest, `main` push마다 실행 |
 | 배포 `build.yml` | Docker Hub 빌드·푸시 job(수동). `Dockerfile` 전까지 실패 |
@@ -42,6 +42,14 @@ HTTPS는 nginx 등 리버스 프록시에서 처리한다. 설계 기준: [웹 �
 - 데스크톱 GUI·CLI·P0 프로브·패키징 코드와 관련 테스트·설계·검증 문서 삭제.
 - 서로 다른 launch_dir 동명 파일 독립 변환 회귀 테스트 추가.
 - 웹 P4 화면 목업 `docs/web-mockup.html` 작성.
+
+## 웹 P2 완료 내용 (2026-10-12)
+
+- 웹 의존성(FastAPI·Uvicorn·Jinja2·python-multipart·itsdangerous)과 테스트용 `httpx2` 추가.
+- `web/config.py`: `APP_PASSWORD`(12자 이상, 예제 값 거부)·`COOKIE_SECURE` 검증, 잘못되면 시작 거부.
+- `web/auth.py`·`web/app.py`: 로그인/로그아웃, 시작마다 새 키로 서명한 쿠키(로그인 후 8시간 절대 만료), 상태 변경 요청 Origin 검사, IP당 1분 5회 실패 제한, 인증 감사 이벤트 stderr 출력.
+- 업로드 화면 전까지 `/`는 로그인 확인용 임시 페이지.
+- 테스트 77개 통과(웹 16개), 실제 uvicorn 스모크 확인.
 
 ## 남은 위험
 
