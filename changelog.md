@@ -3,6 +3,22 @@
 EverythingMarkdown 버전별 변경 이력과 릴리즈 노트입니다. 최신 버전이 위에 옵니다.
 각 버전 섹션은 태그 주석과 GitHub Release 본문에 그대로 사용합니다. 릴리즈 절차는 [README](README.md#릴리즈).
 
+## [26.2.0] - 2026-10-12
+
+폐쇄망에서 로그인 없이 여러 사람이 쓰는 구성과 오프라인 설치 지원.
+
+### Added
+- `AUTH_ENABLED=false`: 비밀번호 없이 사용합니다. 브라우저마다 익명 ID를 발급해 각자 자기 작업만 목록·미리보기·다운로드·삭제할 수 있습니다. 익명 ID는 30일 유지되고 재시작 후에도 이어집니다(서명 키 `data/.session_key`).
+- `MAX_ACTIVE_JOBS`(전체 대기·실행 한도, 기본 3), `CONVERSION_WORKERS`(동시 변환 수, 기본 1) 설정.
+- GitHub Release에 폐쇄망 설치용 이미지 번들 `everythingmarkdown-image-<버전>.tar.gz`와 `.sha256` 체크섬을 첨부합니다(`docker load`로 불러오기).
+- README에 폐쇄망 설치 가이드(파일 반입, 이미지 불러오기, http 설정, 버전 올리기·되돌리기)와 로그인 없이 쓰기 안내를 추가했습니다.
+
+### Changed
+- 작업에 주인(owner) 정보를 저장합니다. 26.1.x의 `app.db`는 시작 시 자동으로 갱신되며 기존 작업은 그대로 보입니다.
+
+### 이미지
+- Docker Hub `igor0670/everythingmarkdown:26.2.0`, `latest` (같은 빌드), `linux/amd64`
+
 ## [26.1.2] - 2026-10-12
 
 로그인 화면 상단 바 보강과 문서 정리.

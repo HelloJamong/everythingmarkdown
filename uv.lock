@@ -219,7 +219,7 @@ wheels = [
 
 [[package]]
 name = "everythingmarkdown"
-version = "26.1.2"
+version = "26.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
