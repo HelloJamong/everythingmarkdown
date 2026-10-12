@@ -15,6 +15,9 @@ from .markitdown_adapter import SUPPORTED_EXTENSIONS, MarkItDownAdapter
 from .models import ConversionError, ConversionRequest, ConversionResult, ErrorCode
 
 MAX_INPUT_BYTES = 100 * 1024 * 1024
+# Zip-bomb guard. Readers trust the declared sizes: zipfile stops at file_size and fails the CRC check.
+MAX_OOXML_UNCOMPRESSED_BYTES = 256 * 1024 * 1024
+MAX_OOXML_ENTRIES = 10_000
 _OOXML_PARTS = {
     ".docx": "word/document.xml",
     ".pptx": "ppt/presentation.xml",
@@ -86,6 +89,10 @@ def _validate_input(path: Path) -> None:
                     required = {"[Content_Types].xml", _OOXML_PARTS[extension]}
                     if not required.issubset(archive.namelist()):
                         raise ConversionError(ErrorCode.INVALID_INPUT, path=path)
+                    entries = archive.infolist()
+                    if (len(entries) > MAX_OOXML_ENTRIES
+                            or sum(e.file_size for e in entries) > MAX_OOXML_UNCOMPRESSED_BYTES):
+                        raise ConversionError(ErrorCode.TOO_LARGE, path=path)
             elif zipped:
                 raise ConversionError(ErrorCode.INVALID_INPUT, path=path)
     except FileNotFoundError:

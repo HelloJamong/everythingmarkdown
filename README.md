@@ -80,5 +80,5 @@ print(result.output_path)  # <launch_dir>/convert_result/report.md
 ## 라이선스
 
 이 프로젝트의 자체 코드는 [MIT License](LICENSE)를 따릅니다.
-MarkItDown 및 전이 의존성 라이선스 목록은 [docs/third-party-licenses.md](docs/third-party-licenses.md)에 정리했습니다(초안).
+MarkItDown 및 전이 의존성 라이선스 목록은 [docs/third-party-licenses.md](docs/third-party-licenses.md)에 정리했고, 원문은 이미지의 `/usr/share/doc/everythingmarkdown/`과 각 패키지 `dist-info`에 들어 있습니다.
 `.omx/`와 `.omc/`는 로컬 작업 기록으로 Git 추적 대상에서 제외합니다.

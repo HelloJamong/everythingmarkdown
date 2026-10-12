@@ -2,7 +2,7 @@
 
 - 최종 정리일: 2026-10-12
 - 제품: **개인용 웹 서비스**. 배포물은 Docker Hub의 통합 웹 서비스 이미지 하나다.
-- 현재 상태: 변환 코어·웹 P1~P5 완료. **다음은 웹 P6(통합 검증·운영 문서)**. 배포는 버전 태그 푸시로 시작한다.
+- 현재 상태: 변환 코어·웹 P1~P6 완료. **다음은 사용자 요청 시 첫 릴리즈 `26.1.0`**. 배포는 버전 태그 푸시로 시작한다. 검증 기록: [docs/web-validation.md](docs/web-validation.md).
 - 관련 문서: [진행 현황](PROGRESS.md) · [웹 서비스 설계·계획](docs/web-service-plan.md) · [릴리즈 정책](docs/releasing.md) · [P1 코어 검증](docs/p1-validation.md)
 - 2026-10-12 결정:
   - 데스크톱 GUI·CLI·P0 프로브·PyInstaller 패키징 폐기(Git 이력에 보존).
@@ -23,7 +23,7 @@
 | 웹 P3 업로드·변환·보관 | 완료 | 일부 계약 보류(아래) |
 | 웹 P4 화면 | 완료 | |
 | 웹 P5 Docker | 완료 | Docker Hub 첫 푸시는 첫 릴리즈 태그에서 |
-| 웹 P6 통합 검증·운영 문서 | **다음** | |
+| 웹 P6 통합 검증·운영 문서 | 완료 | A01~A25 중 충족 17·부분 8 |
 | 릴리즈 | 사용자 배포 요청 대기 | |
 
 ## 변환 코어 — 완료
@@ -81,12 +81,13 @@
 - [ ] `build.yml` 첫 실행(첫 릴리즈 태그)으로 Docker Hub 로그인·빌드·푸시 확인.
 - [ ] 배포 서버에 digest 갱신 스크립트(cron) 설치(Watchtower 미사용). 스크립트 예시는 배포 문서에 있음.
 
-## 웹 P6 — 통합 검증과 운영 문서
+## 웹 P6 — 통합 검증과 운영 문서 (완료)
 
-- [ ] 웹 A01~A25 수용 기준 검증 및 lint/typecheck/회귀/컨테이너 smoke 기록.
+- [x] 웹 A01~A25 수용 기준 판정과 근거 기록 [docs/web-validation.md](docs/web-validation.md): 충족 17, 부분 8(A07·A12·A14·A15·A20·A23·A24 등 미검증·미구현 부분 명시). 테스트 108개·lint·mypy·wheel·컨테이너 smoke.
+- [x] 검증 중 보완: OOXML 압축 해제 합계 256 MiB·항목 1만 개 제한(A08), 재시작 시 기록 전 결과·고아 폴더 제거(A25), 보완 테스트 `tests/web/test_acceptance.py` 9개.
 - [x] DB 백업, 이미지 rollback 절차 문서화(배포 문서 4·5장). 복원 실습은 미실행.
-- [ ] 실제 도메인·nginx 위치(같은 Docker 네트워크/호스트/다른 서버)·호스트 자원 확인(현재 미확인).
-- [ ] 이미지에 포함되는 의존성 라이선스 고지 확정([목록 초안](docs/third-party-licenses.md)).
+- [ ] 실제 도메인·nginx 위치(같은 Docker 네트워크/호스트/다른 서버)·호스트 자원 확인(현재 미확인). 확인 후 A14 HTTPS 경유 검증.
+- [x] 이미지 런타임 의존성 55개 라이선스 고지 확정([목록](docs/third-party-licenses.md)). wheel에 원문이 없는 markitdown·magika·flatbuffers·cobble 원문을 `licenses/`에 보충, 이미지 `/usr/share/doc/everythingmarkdown/`에 포함.
 
 ## 최초 릴리즈 — 사용자 배포 요청 후에만
 

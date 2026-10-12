@@ -163,7 +163,14 @@ class Jobs:
         stale = self._exec("SELECT id FROM jobs WHERE state IN ('queued', 'running')")
         for row in stale:
             self._finish(row["id"], "interrupted", INTERRUPTED_ERROR)
+            self.remove_markdown(row["id"])  # published just before the crash, never recorded
             logs.audit("job_interrupted", job_id=row["id"])
+        known = {row["id"] for row in self._exec("SELECT id FROM jobs")}
+        for kind in ("uploads", "markdown"):
+            for directory in (self.root / kind).iterdir():
+                if directory.name not in known:  # crash between file write and DB insert
+                    shutil.rmtree(directory, ignore_errors=True)
+                    logs.audit("orphan_removed", kind=kind)
         shutil.rmtree(self.root / ".work", ignore_errors=True)
         (self.root / ".work").mkdir(exist_ok=True)
         for row in self._exec("SELECT id FROM jobs WHERE upload_expires_at IS NULL AND upload_gone = 0"

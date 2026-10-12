@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-from zipfile import ZipFile
+from zipfile import ZIP_DEFLATED, ZipFile
 
 from everythingmarkdown.models import ConversionError, ConversionRequest, ErrorCode
 from everythingmarkdown.service import ConversionService
@@ -138,6 +138,18 @@ class ConversionServiceTests(unittest.TestCase):
         result = self.service.convert(self.make_request(source))
         self.assertEqual(self.launch_dir / "convert_result" / "good.md", result.output_path)
         self.adapter.convert.assert_called_once_with(source)
+
+    def test_rejects_ooxml_that_expands_past_limits(self):
+        source = self.input_dir / "bomb.docx"
+        with ZipFile(source, "w", compression=ZIP_DEFLATED) as archive:
+            archive.writestr("[Content_Types].xml", "<Types />")
+            archive.writestr("word/document.xml", "<document />")
+            archive.writestr("word/media/zeros.bin", b"\0" * 4096)
+        with patch("everythingmarkdown.service.MAX_OOXML_UNCOMPRESSED_BYTES", 4096):
+            self.assert_conversion_error(ErrorCode.TOO_LARGE, self.make_request(source))
+        with patch("everythingmarkdown.service.MAX_OOXML_ENTRIES", 2):
+            self.assert_conversion_error(ErrorCode.TOO_LARGE, self.make_request(source))
+        self.adapter.convert.assert_not_called()
 
     def test_accepts_pptx_ooxml_zip_structure(self):
         source = self.input_dir / "good.pptx"

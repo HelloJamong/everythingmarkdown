@@ -15,6 +15,7 @@ RUN useradd --system --uid 10001 --user-group --home-dir /nonexistent --no-creat
  && mkdir -p /data /logs && chown app:app /data /logs
 COPY --from=build /app/.venv /app/.venv
 COPY LICENSE docs/third-party-licenses.md /usr/share/doc/everythingmarkdown/
+COPY licenses /usr/share/doc/everythingmarkdown/licenses
 ENV PATH=/app/.venv/bin:$PATH PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
     DATA_DIR=/data LOG_DIR=/logs
 USER app

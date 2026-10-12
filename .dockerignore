@@ -5,6 +5,7 @@
 !README.md
 !LICENSE
 !docs/third-party-licenses.md
+!licenses/
 !src/
 **/__pycache__
 **/*.py[cod]

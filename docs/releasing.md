@@ -65,9 +65,9 @@ Jamong-Harvest의 versioning 규칙을 따른다. SemVer의 호환성 의미와 
 
 ## 5. 현재 배포 준비 완료 조건
 
-- [ ] 웹 P1~P6 구현과 자동 테스트·정적 검사·컨테이너 smoke 근거 확보. 미검증 항목을 명시.
+- [x] 웹 P1~P6 구현과 자동 테스트·정적 검사·컨테이너 smoke 근거 확보, 미검증 항목 명시([검증 기록](web-validation.md)).
 - [x] `Dockerfile`·`compose.yaml`·`.dockerignore`·`.env.example` 작성, 이미지 build/up/health 확인(2026-10-12 로컬).
-- [ ] MIT 및 이미지에 포함되는 의존성의 라이선스 고지 포함.
+- [x] MIT 및 이미지에 포함되는 의존성의 라이선스 고지 포함(2026-10-12, [목록](third-party-licenses.md)).
 - [x] `changelog.md`, `pyproject.toml` 버전, 태그, 이미지 태그 일치 검사(`build.yml`이 자동 확인).
 - [ ] 사용자 명시 요청 후 릴리즈 커밋(`chore: <version> 릴리즈`), annotated tag와 push 수행. 태그 push가 이미지 배포를 시작한다.
 - [ ] 태그 push로 실행된 `build.yml` 성공 후 Docker Hub의 `latest`·버전 태그 digest가 같은지 확인.
